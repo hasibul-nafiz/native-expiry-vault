@@ -16,3 +16,7 @@ export { Input } from './Input';
 export type { InputProps } from './Input';
 export { BottomSheet } from './BottomSheet';
 export type { BottomSheetProps } from './BottomSheet';
+export { Icon, iconForCategory } from './Icon';
+export type { IconProps, IconName } from './Icon';
+export { CountdownRing, dashOffsetFor } from './CountdownRing';
+export type { CountdownRingProps } from './CountdownRing';

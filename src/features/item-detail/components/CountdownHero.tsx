@@ -1,0 +1,113 @@
+import { StyleSheet, View } from 'react-native';
+
+import { CountdownRing, StatusBadge, Text } from '@/components';
+import type { IsoDate, Item } from '@/db/models';
+import { daysUntilExpiry, documentStatus, lifetimeElapsed } from '@/features/expiry';
+import { useTheme } from '@/theme';
+
+import { daysLeftLabel } from '../../dashboard/selectors';
+
+/**
+ * The countdown ring and the lifetime bar.
+ *
+ * The export labels its bar "Lifetime Elapsed" but its width, and the ring's
+ * arc, both match the fraction *remaining*. Rather than pick one and leave the
+ * contradiction in place, both are rendered as remaining and labelled as such.
+ *
+ * Without an issue date there is no lifetime to measure, so the ring falls back
+ * to the proportion of the final year remaining — a document with no start date
+ * still needs a ring to draw.
+ */
+
+const FALLBACK_WINDOW_DAYS = 365;
+
+export interface CountdownHeroProps {
+  item: Item;
+  today: IsoDate;
+}
+
+const statusLabels = { safe: 'Valid', soon: 'Expiring soon', expired: 'Expired' } as const;
+
+export function CountdownHero({ item, today }: CountdownHeroProps) {
+  const theme = useTheme();
+  const status = documentStatus(item.expiryDate, today);
+  const tone = theme.status[status];
+  const remainingDays = daysUntilExpiry(item.expiryDate, today);
+
+  const elapsed = lifetimeElapsed(item.issueDate, item.expiryDate, today);
+  const remainingFraction =
+    elapsed === null ? Math.min(1, Math.max(0, remainingDays / FALLBACK_WINDOW_DAYS)) : 1 - elapsed;
+
+  const percentRemaining = Math.round(remainingFraction * 100);
+
+  return (
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: theme.colors.surfaceContainerLowest,
+          borderColor: theme.colors.outlineVariant,
+          borderRadius: theme.radius.xl,
+          borderWidth: StyleSheet.hairlineWidth,
+          gap: theme.spacing.md,
+          padding: theme.spacing.lg,
+        },
+      ]}
+      testID="countdown-hero"
+    >
+      <StatusBadge label={statusLabels[status]} status={status} />
+
+      <CountdownRing fraction={remainingFraction} testID="countdown-ring" tone={tone.foreground}>
+        <Text maxFontSizeMultiplier={1.3} testID="countdown-days" variant="displayLgMobile">
+          {remainingDays < 0 ? String(Math.abs(remainingDays)) : String(remainingDays)}
+        </Text>
+        <Text style={{ color: tone.foreground }} variant="labelSm">
+          {remainingDays < 0 ? 'DAYS AGO' : 'DAYS LEFT'}
+        </Text>
+        <Text color="onSurfaceVariant" variant="bodySm">
+          {daysLeftLabel(item.expiryDate, today)}
+        </Text>
+      </CountdownRing>
+
+      <View style={[styles.bar, { gap: theme.spacing.xs }]}>
+        <View
+          style={[
+            styles.track,
+            {
+              backgroundColor: theme.colors.surfaceContainerHighest,
+              borderRadius: theme.radius.full,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.fill,
+              {
+                backgroundColor: tone.foreground,
+                borderRadius: theme.radius.full,
+                width: `${percentRemaining}%`,
+              },
+            ]}
+            testID="lifetime-bar-fill"
+          />
+        </View>
+        <View style={styles.barLabels}>
+          <Text color="onSurfaceVariant" variant="bodySm">
+            Lifetime remaining
+          </Text>
+          <Text style={{ color: tone.foreground }} testID="percent-remaining" variant="labelSm">
+            {`${percentRemaining}%`}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  bar: { width: '100%' },
+  barLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+  card: { alignItems: 'center' },
+  fill: { height: '100%' },
+  track: { height: 8, overflow: 'hidden', width: '100%' },
+});

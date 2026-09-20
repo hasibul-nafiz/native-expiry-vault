@@ -38,16 +38,18 @@ export function Button({
   const theme = useTheme();
   const inactive = disabled || loading;
 
-  const palette: Record<ButtonVariant, { background: string; label: PaletteColor; border?: string }> =
-    {
-      primary: { background: theme.colors.primary, label: 'onPrimary' },
-      secondary: {
-        background: theme.colors.surfaceContainerLowest,
-        label: 'primary',
-        border: theme.colors.outline,
-      },
-      ghost: { background: 'transparent', label: 'primary' },
-    };
+  const palette: Record<
+    ButtonVariant,
+    { background: string; label: PaletteColor; border?: string }
+  > = {
+    primary: { background: theme.colors.primary, label: 'onPrimary' },
+    secondary: {
+      background: theme.colors.surfaceContainerLowest,
+      label: 'primary',
+      border: theme.colors.outline,
+    },
+    ghost: { background: 'transparent', label: 'primary' },
+  };
 
   const { background, label: labelColor, border } = palette[variant];
 
