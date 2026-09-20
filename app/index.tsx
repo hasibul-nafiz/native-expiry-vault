@@ -1,17 +1,18 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Link } from 'expo-router';
+
+import { Screen, Text } from '@/components';
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text>ExpiryVault</Text>
-    </View>
+    <Screen>
+      <Text variant="headlineMd">ExpiryVault</Text>
+      {__DEV__ ? (
+        <Link accessibilityRole="link" href="/dev-gallery">
+          <Text color="primary" variant="labelLg">
+            UI kit gallery
+          </Text>
+        </Link>
+      ) : null}
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
