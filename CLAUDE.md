@@ -31,7 +31,7 @@ npm run typecheck | npm run lint | npm test | npx expo start --dev-client
 
 ## Platform rules
 - Safe areas, 44pt (iOS) / 48dp (Android) touch targets, font scaling supported.
-- Native back gesture/button behavior, keyboard avoidance, dark mode.
+- Native back gesture/button behavior, keyboard avoidance.
 - VoiceOver/TalkBack labels and roles on every interactive element.
 - Platform differences only via Platform.select inside dedicated components.
 - Permissions: request just-in-time with rationale. Notifications use inexact
