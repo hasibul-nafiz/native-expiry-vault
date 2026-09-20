@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-surface": "#0f172a",
+          "on-surface-variant": "#64748b",
+          "surface": "#f8f9fd",
+          "surface-card": "#ffffff",
+          "primary": "#6366f1",
+          "primary-hover": "#4f46e5",
+          "primary-light": "#eef2ff",
+          "secondary": "#7c3aed",
+          "tertiary": "#10b981",
+          "tertiary-light": "#ecfdf5",
+          "error": "#ef4444",
+          "error-light": "#fef2f2",
+          "outline-subtle": "rgba(99, 102, 241, 0.08)",
+          "outline-border": "#f1f3f9"
+        },
+        borderRadius: {
+          "DEFAULT": "0.25rem",
+          "lg": "0.75rem",
+          "xl": "1rem",
+          "2xl": "1.5rem",
+          "full": "9999px"
+        },
+        fontFamily: {
+          "headline-lg": ["Inter", "sans-serif"],
+          "body-sm": ["Inter", "sans-serif"],
+          "label-lg": ["Inter", "sans-serif"],
+          "body-md": ["Inter", "sans-serif"],
+          "title-lg": ["Inter", "sans-serif"],
+          "label-sm": ["Inter", "sans-serif"],
+          "body-lg": ["Inter", "sans-serif"],
+          "title-md": ["Inter", "sans-serif"],
+          "label-md": ["Inter", "sans-serif"],
+          "headline-md": ["Inter", "sans-serif"]
+        }
+      },
+    },
+  }
+</script><style>
+  @layer base {
+    html, body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fd;
+      color: #0f172a;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    min-height: max(884px, 100dvh);
+  }
+</style></head><body class="bg-surface text-on-surface flex flex-col min-h-screen selection:bg-primary-light selection:text-primary"><!-- Top Sticky Header --><header class="fixed top-0 inset-x-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100 pt-safe"><div class="h-16 px-5 flex items-center justify-between"><div class="flex items-center gap-3"><button class="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 active:scale-95 transition-all" onclick="history.back()"><span class="material-symbols-outlined text-[22px]">arrow_back</span></button><div class="flex items-center gap-2"><img alt="ExpiryVault Logo" class="h-7 w-auto object-contain rounded-md" src="https://lh3.googleusercontent.com/aida/AEtjO1V2xPQjtaf4felt6BfRYdeZu48nTrWFG_pp_ZeikRoKLrbIn_LtT8rwgpe2nMuhmQM6rYzHrqtwpZuIcAXYbnRvtC1-xtM65s3jbqV7a8orB7dRtthWTxruC9-hXd1S8DgNunBP-5YmYQEfSOfD-NcRNXSw3xFH8neoWogg36zugu_JeCKgFlSc3z_9xAe8ykHLhuRBLiLicrXYh5uO8RAhR-gOH5J3EkQH6hpxwCK3Kg"/><span class="font-semibold text-[17px] text-slate-900 tracking-tight">Details</span></div></div><div class="flex items-center gap-1.5"><button aria-label="Share encrypted link" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 active:scale-95 transition-all" id="shareBtn"><span class="material-symbols-outlined text-[20px]">share</span></button><button aria-label="More options" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-100 active:scale-95 transition-all"><span class="material-symbols-outlined text-[20px]">more_vert</span></button></div></div></header><main class="flex-1 flex flex-col relative w-full pt-20 pb-safe"><div class="flex flex-col w-full px-4 sm:px-6 max-w-md mx-auto pb-12 gap-5 select-none">
+<!-- Document Title & Badges Header Card -->
+<div class="bg-white rounded-2xl p-4 shadow-sm border border-indigo-50/80 flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-indigo-100">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-slate-900 text-[16px] truncate leading-tight">German Residence Permit</span>
+<span class="text-xs text-slate-500 truncate mt-0.5 font-medium">Aufenthaltstitel • Blue Card EU</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+<span class="material-symbols-outlined text-[19px]">edit</span>
+</button>
+<button aria-label="Delete document" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" id="deleteBtn">
+<span class="material-symbols-outlined text-[19px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Hero Expiry Countdown Card -->
+<section class="relative w-full rounded-2xl bg-white p-6 shadow-sm border border-indigo-50/80 overflow-hidden flex flex-col items-center text-center">
+<!-- Soft Decorative Background Glow inspired by purple theme -->
+<div class="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-indigo-100/60 to-purple-50/20 rounded-full blur-2xl pointer-events-none -mr-16 -mt-16"></div>
+<div class="absolute bottom-0 left-0 w-36 h-36 bg-gradient-to-tr from-pink-50/40 to-indigo-50/30 rounded-full blur-2xl pointer-events-none -ml-12 -mb-12"></div>
+<!-- Status Pill -->
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-100/80 mb-3 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+<span class="text-[11px] font-semibold text-rose-600 tracking-wider uppercase">Expiring Soon</span>
+</div>
+<!-- Circular Progress Visual -->
+<div class="relative w-44 h-44 flex items-center justify-center my-1">
+<svg class="w-full h-full transform -rotate-90 drop-shadow-sm" viewbox="0 0 160 160">
+<defs>
+<lineargradient id="indigoGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#818cf8"></stop>
+<stop offset="60%" stop-color="#6366f1"></stop>
+<stop offset="100%" stop-color="#4f46e5"></stop>
+</lineargradient>
+</defs>
+<!-- Background Track -->
+<circle class="text-slate-100" cx="80" cy="80" fill="transparent" r="66" stroke="currentColor" stroke-width="8"></circle>
+<!-- Active Progress Ring -->
+<circle class="transition-all duration-1000 ease-out" cx="80" cy="80" fill="transparent" id="countdownRing" r="66" stroke="url(#indigoGradient)" stroke-dasharray="414.69" stroke-dashoffset="394.78" stroke-linecap="round" stroke-width="9"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-bold text-slate-900 tracking-tight">18</span>
+<span class="text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mt-0.5">Days Left</span>
+<span class="text-xs text-slate-400 font-medium mt-1">Valid until Oct 28</span>
+</div>
+</div>
+<!-- Linear lifetime indicator -->
+<div class="w-full max-w-xs mt-2 mb-4">
+<div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden p-0.5">
+<div class="h-full bg-gradient-to-r from-indigo-500 to-rose-500 rounded-full" style="width: 4.8%;"></div>
+</div>
+<div class="flex justify-between items-center mt-1.5 px-0.5 text-[11px] text-slate-500 font-medium">
+<span>Lifetime Elapsed</span>
+<span class="text-rose-600 font-semibold">4.8% Remaining</span>
+</div>
+</div>
+<!-- Sub-stats Grid (Light & Clean) -->
+<div class="grid grid-cols-3 w-full gap-2 pt-3 border-t border-slate-100">
+<div class="flex flex-col items-center justify-center py-2 px-1 text-center bg-slate-50/70 rounded-xl">
+<span class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Issued</span>
+<span class="text-sm font-semibold text-slate-800 mt-0.5">29 Oct 2022</span>
+<span class="text-[11px] text-slate-400">Berlin, DE</span>
+</div>
+<div class="flex flex-col items-center justify-center py-2 px-1 text-center bg-rose-50/60 rounded-xl border border-rose-100/50">
+<span class="text-[11px] uppercase tracking-wider font-semibold text-rose-500">Expires</span>
+<span class="text-sm font-bold text-rose-600 mt-0.5">28 Oct 2025</span>
+<span class="text-[11px] text-rose-400 font-medium">18 days left</span>
+</div>
+<div class="flex flex-col items-center justify-center py-2 px-1 text-center bg-slate-50/70 rounded-xl">
+<span class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Document ID</span>
+<span class="text-sm font-semibold text-slate-800 mt-0.5">•••• 9204</span>
+<span class="text-[11px] text-slate-400">Type I-C</span>
+</div>
+</div>
+</section>
+<!-- Clean Action Buttons -->
+<section class="flex flex-col gap-2.5">
+<button class="w-full h-13 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 text-white font-medium text-[15px] flex items-center justify-center gap-2 shadow-lg shadow-indigo-200/70 hover:opacity-95 active:scale-[0.98] transition-all" id="renewBtn">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+<span>Mark as Renewed</span>
+</button>
+<div class="grid grid-cols-2 gap-2.5">
+<button class="h-11 px-4 rounded-xl bg-white border border-slate-200/80 text-slate-700 hover:bg-slate-50 font-medium text-xs flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-sm" id="urgentAlertBtn">
+<span class="material-symbols-outlined text-rose-500 text-[18px]">notification_important</span>
+<span>Urgent Alerts</span>
+</button>
+<button class="h-11 px-4 rounded-xl bg-white border border-slate-200/80 text-slate-700 hover:bg-slate-50 font-medium text-xs flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-sm" id="viewDocBtn">
+<span class="material-symbols-outlined text-indigo-600 text-[18px]">visibility</span>
+<span>View Original</span>
+</button>
+</div>
+</section>
+<!-- Renewal Checklist Roadmap -->
+<section class="w-full rounded-2xl bg-white p-5 shadow-sm border border-indigo-50/80 flex flex-col gap-3.5">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[19px]">fact_check</span>
+</div>
+<span class="font-semibold text-slate-900 text-[15px]">Renewal Roadmap</span>
+</div>
+<span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">2 of 4 Ready</span>
+</div>
+<div class="flex flex-col gap-2.5" id="checklistContainer">
+<!-- Step 1 Complete -->
+<label class="flex items-start gap-3 p-3 rounded-xl bg-slate-50/80 border border-transparent hover:border-indigo-100 cursor-pointer transition-all">
+<input checked="" class="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600 border-slate-300" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-medium text-slate-400 line-through">Download official application form</span>
+<span class="text-[11px] text-slate-400 mt-0.5">Obtained from Berlin LEA portal</span>
+</div>
+</label>
+<!-- Step 2 Complete -->
+<label class="flex items-start gap-3 p-3 rounded-xl bg-slate-50/80 border border-transparent hover:border-indigo-100 cursor-pointer transition-all">
+<input checked="" class="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600 border-slate-300" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-medium text-slate-400 line-through">Updated biometric passport photos (35x45mm)</span>
+<span class="text-[11px] text-slate-400 mt-0.5">Compliant with ICAO standard • Printed set ready</span>
+</div>
+</label>
+<!-- Step 3 Incomplete Urgent -->
+<label class="flex items-start gap-3 p-3 rounded-xl bg-indigo-50/30 border border-indigo-100/60 cursor-pointer transition-all">
+<input class="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600 border-slate-300" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="text-xs font-semibold text-slate-900 leading-snug">Employer confirmation (Arbeitsbescheinigung)</span>
+<span class="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-semibold">Due Oct 10</span>
+</div>
+<span class="text-[11px] text-slate-500 mt-0.5">Signed contract addendum &amp; last 3 payslips</span>
+</div>
+</label>
+<!-- Step 4 Incomplete -->
+<label class="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-200/70 hover:border-indigo-100 cursor-pointer transition-all">
+<input class="mt-0.5 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500/30 accent-indigo-600 border-slate-300" type="checkbox"/>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-slate-800">Attend LEA in-person appointment</span>
+<span class="text-[11px] text-slate-500 mt-0.5">Friedrich-Krause-Ufer 24, 13353 Berlin</span>
+</div>
+</label>
+</div>
+</section>
+<!-- Encrypted Vault Scans -->
+<section class="w-full rounded-2xl bg-white p-5 shadow-sm border border-indigo-50/80 flex flex-col gap-3.5">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[19px]">folder_supervised</span>
+</div>
+<span class="font-semibold text-slate-900 text-[15px]">Encrypted Vault Scans</span>
+</div>
+<div class="inline-flex items-center gap-1 text-emerald-600 font-medium text-[11px] bg-emerald-50 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px]">lock</span>
+<span>AES-GCM-256</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Front Scan Card -->
+<div class="group relative rounded-xl border border-slate-100 bg-slate-50/60 p-2.5 flex flex-col gap-2 hover:bg-indigo-50/30 hover:border-indigo-100 transition-all cursor-pointer">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-slate-200/60 flex items-center justify-center shadow-inner">
+<img alt="Document Front Scan" class="w-full h-full object-cover filter blur-[2px] opacity-60 group-hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr9Z9kxDuuFXkH43IXh0s-YBP3xT_ijLPj6i4JXoLm8-qloaNxkCqSsre8zuEz9LHc0DWGycz4Eu6zCIFXvX8o6qbQ45NqoIYX-DRfan4XF-dt8g9hJmFCSPmtKQdQWyCf0oMSjfT8rAq1Csd1uZF9TsJiBHS9lnEXmemenA-cqz-b5YFt8TwHtgo97EWrb6h_pjAZxGXpS_tqS3zWwjWhQJG1Da0-p23S1PT-9J9A"/>
+<div class="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center p-2 text-center">
+<div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">fingerprint</span>
+</div>
+<span class="text-[10px] font-semibold text-slate-700 mt-1 uppercase tracking-wider">Biometric Card</span>
+</div>
+</div>
+<div class="flex flex-col px-1">
+<span class="text-xs font-semibold text-slate-800 truncate">Front_eID_Aufenthalt.raw</span>
+<span class="text-[11px] text-slate-400">2.1 MB • Encrypted</span>
+</div>
+</div>
+<!-- Back Scan Card -->
+<div class="group relative rounded-xl border border-slate-100 bg-slate-50/60 p-2.5 flex flex-col gap-2 hover:bg-indigo-50/30 hover:border-indigo-100 transition-all cursor-pointer">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-slate-200/60 flex items-center justify-center shadow-inner">
+<img alt="Document Back Scan" class="w-full h-full object-cover filter blur-[2px] opacity-60 group-hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6nHCtWBeOrULDD_gz3bqsUYmgJUd_CCrx9EvdNQeKWpWA-Yczol7W__cO2Ld6d05Rt-FJi7fHNBXFjqeLw_XAfWELdl2QIErvn7oVbvvBzOz1CtY_S5wG0EmUlnwiMxah_-7xmMg8sf7Dca-H4W8JVLXeb5NwBxO33yq_bXHgnVvEx-dD8govuR-b5a6dpa6KiQlZt3d2NWINjrbMUh1lruplLGF4fI7o0XW3-0fU"/>
+<div class="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center p-2 text-center">
+<div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+</div>
+<span class="text-[10px] font-semibold text-slate-700 mt-1 uppercase tracking-wider">Encrypted PDF</span>
+</div>
+</div>
+<div class="flex flex-col px-1">
+<span class="text-xs font-semibold text-slate-800 truncate">Back_MRZ_Full.pdf</span>
+<span class="text-[11px] text-slate-400">1.4 MB • Signed hash</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Secure Notes & Notification Cadence -->
+<section class="w-full rounded-2xl bg-white p-5 shadow-sm border border-indigo-50/80 flex flex-col gap-3.5">
+<div class="flex items-center gap-2.5 pb-1">
+<div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[19px]">sticky_note_2</span>
+</div>
+<span class="font-semibold text-slate-900 text-[15px]">Secure Notes &amp; Cadence</span>
+</div>
+<!-- Note Box -->
+<div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Appointment Reference</span>
+<span class="material-symbols-outlined text-[15px] text-indigo-500">key</span>
+</div>
+<p class="text-xs leading-relaxed text-slate-700">
+        Appointment booked for Oct 12, reference <span class="font-semibold text-indigo-600">#ABH-99201</span>. Take updated tax clearance certificates (Bescheinigung in Steuersachen) and last 3 payslips.
+      </p>
+</div>
+<!-- Notification Cadence Tracker -->
+<div class="flex flex-col gap-2 pt-1">
+<div class="flex items-center justify-between text-xs">
+<span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Notification Schedule</span>
+<span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">5 Active Pings</span>
+</div>
+<div class="grid grid-cols-5 gap-1.5 p-1 bg-slate-50 rounded-xl border border-slate-100">
+<div class="py-2 rounded-lg bg-white shadow-xs text-center flex flex-col items-center">
+<span class="text-[11px] font-semibold text-slate-400 line-through">90d</span>
+<span class="material-symbols-outlined text-[14px] text-emerald-500 mt-0.5">check_circle</span>
+</div>
+<div class="py-2 rounded-lg bg-white shadow-xs text-center flex flex-col items-center">
+<span class="text-[11px] font-semibold text-slate-400 line-through">60d</span>
+<span class="material-symbols-outlined text-[14px] text-emerald-500 mt-0.5">check_circle</span>
+</div>
+<div class="py-2 rounded-lg bg-white shadow-xs text-center flex flex-col items-center">
+<span class="text-[11px] font-semibold text-slate-400 line-through">30d</span>
+<span class="material-symbols-outlined text-[14px] text-emerald-500 mt-0.5">check_circle</span>
+</div>
+<div class="py-2 rounded-lg bg-rose-50 border border-rose-200/60 text-center flex flex-col items-center shadow-xs">
+<span class="text-[11px] font-bold text-rose-600">14d</span>
+<span class="material-symbols-outlined text-[14px] text-rose-500 mt-0.5">alarm</span>
+</div>
+<div class="py-2 rounded-lg bg-white shadow-xs text-center flex flex-col items-center opacity-60">
+<span class="text-[11px] font-medium text-slate-500">1d</span>
+<span class="material-symbols-outlined text-[14px] text-slate-400 mt-0.5">hourglass_top</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Hardware Vault Badge Footer -->
+<footer class="w-full rounded-2xl bg-white p-4 shadow-sm border border-indigo-50/80 flex items-center justify-between mt-1">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">security</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-slate-900">Zero-Knowledge Hardware Vault</span>
+<span class="text-[11px] text-slate-500 truncate">100% on-device enclave. Zero cloud sync.</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-emerald-500 text-[20px] flex-shrink-0">verified</span>
+</footer>
+</div>
+<script>
+  // Simple interactive feedback micro-delight
+  const markRenewedBtn = document.getElementById('renewBtn');
+  const countdownRing = document.getElementById('countdownRing');
+  
+  if (markRenewedBtn && countdownRing) {
+    markRenewedBtn.addEventListener('click', () => {
+      markRenewedBtn.classList.add('scale-95');
+      setTimeout(() => {
+        markRenewedBtn.classList.remove('scale-95');
+        markRenewedBtn.classList.remove('from-indigo-600', 'to-purple-600');
+        markRenewedBtn.classList.add('bg-emerald-600');
+        markRenewedBtn.innerHTML = `
+          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          <span>Renewal In Review</span>
+        `;
+        countdownRing.style.strokeDashoffset = '0';
+        countdownRing.style.stroke = '#10b981';
+      }, 150);
+    });
+  }
+
+  const urgentBtn = document.getElementById('urgentAlertBtn');
+  if (urgentBtn) {
+    urgentBtn.addEventListener('click', () => {
+      urgentBtn.classList.toggle('bg-rose-50');
+      urgentBtn.classList.toggle('border-rose-200');
+      urgentBtn.classList.toggle('text-rose-700');
+    });
+  }
+
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      shareBtn.classList.add('text-indigo-600', 'bg-indigo-50');
+      setTimeout(() => {
+        shareBtn.classList.remove('text-indigo-600', 'bg-indigo-50');
+      }, 800);
+    });
+  }
+</script></main></body></html>

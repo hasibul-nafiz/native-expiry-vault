@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5046e5",
+            "primary-container": "#6063ee",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#e1e0ff",
+            "primary-fixed-dim": "#c0c1ff",
+            "secondary": "#6b38d4",
+            "secondary-container": "#8455ef",
+            "secondary-fixed": "#ede9fe",
+            "surface": "#f8f9fe",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f3f4fd",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "on-surface": "#171d33",
+            "on-surface-variant": "#5f6682",
+            "outline": "#8991a9",
+            "outline-variant": "#e2e5f1",
+            "tertiary": "#059669",
+            "tertiary-fixed": "#a7f3d0",
+            "error": "#e11d48",
+            "error-container": "#ffe4e6"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "2xl": "1.25rem",
+            "3xl": "1.75rem"
+          },
+          boxShadow: {
+            "card": "0 2px 12px -2px rgba(99, 102, 241, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03)",
+            "elevated": "0 10px 30px -6px rgba(79, 70, 229, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.02)"
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fe;
+        color: #171d33;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      body {
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        min-height: max(884px, 100dvh);
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 16px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface flex flex-col min-h-screen select-none">
+<!-- Header -->
+<header class="fixed top-0 w-full z-40 pt-safe bg-surface/90 backdrop-blur-xl border-b border-outline-variant/60">
+<div class="h-14 px-5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button aria-label="Go back" class="w-9 h-9 rounded-full bg-white border border-outline-variant/80 flex items-center justify-center text-on-surface hover:bg-surface-container-low transition active:scale-95 shadow-xs">
+<span class="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-on-surface">Settings</h1>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Profile" class="w-9 h-9 rounded-full bg-white border border-outline-variant/80 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition shadow-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">account_circle</span>
+</button>
+</div>
+</div>
+<!-- Soft iOS Search Bar -->
+<div class="px-5 pb-3 pt-1">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+<input class="w-full bg-white pl-10 pr-4 py-2 text-sm rounded-xl border border-outline-variant/70 placeholder:text-outline/80 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-xs" placeholder="Search settings, alerts, formats..." type="text"/>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 pt-32 pb-28 px-5 max-w-lg mx-auto w-full flex flex-col gap-6">
+<!-- Group 1: Preferences -->
+<section>
+<div class="flex items-center justify-between px-1 mb-2">
+<span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Preferences</span>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant/80 divide-y divide-outline-variant/60 shadow-card overflow-hidden">
+<!-- Language Row -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low" id="lang-row">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">language</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Language</div>
+<div class="text-xs text-on-surface-variant">Interface &amp; offline localization</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-medium text-primary bg-primary-fixed/60 px-2.5 py-1 rounded-full flex items-center gap-1">
+<span>🇺🇸</span>
+<span>English (US)</span>
+</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Date Format Row -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low" id="date-format-row">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Date Format</div>
+<div class="text-xs text-on-surface-variant">e.g. 24/10/2026</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-lg">DD/MM/YYYY</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Theme Row -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">light_mode</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Theme &amp; Appearance</div>
+<div class="text-xs text-on-surface-variant">Lumina Light Mode</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-medium text-on-surface-variant">System (Light)</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Group 2: Notifications & Reminders -->
+<section>
+<div class="flex items-center justify-between px-1 mb-2">
+<span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Notifications &amp; Alerts</span>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant/80 divide-y divide-outline-variant/60 shadow-card overflow-hidden">
+<!-- Master Reminders Toggle -->
+<div class="p-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Smart Expiry Reminders</div>
+<div class="text-xs text-on-surface-variant">Local alerts before items expire</div>
+</div>
+</div>
+<button aria-label="Smart Expiry Reminders" class="toggle-switch w-12 h-6 rounded-full bg-primary relative transition-colors focus:outline-none" data-enabled="true" type="button">
+<span class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform"></span>
+</button>
+</div>
+<!-- Reminder Schedule (Clean Subpage Row instead of 4 cluttering toggles) -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Reminder Schedule</div>
+<div class="text-xs text-primary font-medium">6 months, 30 days &amp; 7 days prior</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-xs text-outline font-medium">3 active</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Urgent Alarm Sound -->
+<div class="p-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-error-container/60 text-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">volume_up</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Urgent Alarm Sound</div>
+<div class="text-xs text-on-surface-variant">Chime for final 48-hour expirations</div>
+</div>
+</div>
+<button aria-label="Urgent Alarm Sound" class="toggle-switch w-12 h-6 rounded-full bg-primary relative transition-colors focus:outline-none" data-enabled="true" type="button">
+<span class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Group 3: Document Categories -->
+<section>
+<div class="flex items-center justify-between px-1 mb-2">
+<span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Document Categories</span>
+<button class="text-xs font-semibold text-primary hover:text-secondary transition flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[15px]">add</span>
+<span>New Category</span>
+</button>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant/80 shadow-card overflow-hidden">
+<!-- Clean Row: Manage Categories -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">category</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-semibold text-on-surface">Manage Categories</span>
+<span class="text-[11px] font-semibold bg-secondary-fixed text-secondary px-2 py-0.5 rounded-full">6 types</span>
+</div>
+<div class="text-xs text-on-surface-variant mt-0.5">Passports, Visas, Health, Subscriptions...</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+<!-- Quick inline helper tag strip -->
+<div class="px-4 py-2.5 bg-surface-container-low/60 border-t border-outline-variant/60 flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Custom tags &amp; color hues customizable</span>
+<button class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+<span>Reorder</span>
+<span class="material-symbols-outlined text-[14px]">tune</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Group 4: Vault & Security -->
+<section>
+<div class="flex items-center justify-between px-1 mb-2">
+<span class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Vault &amp; Security</span>
+<span class="text-[11px] font-medium text-tertiary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          AES-256
+        </span>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant/80 divide-y divide-outline-variant/60 shadow-card overflow-hidden">
+<!-- Biometric Lock -->
+<div class="p-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">fingerprint</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Face ID / Biometric Lock</div>
+<div class="text-xs text-on-surface-variant">Secure Enclave authentication</div>
+</div>
+</div>
+<button aria-label="Face ID Lock" class="toggle-switch w-12 h-6 rounded-full bg-primary relative transition-colors focus:outline-none" data-enabled="true" type="button">
+<span class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform"></span>
+</button>
+</div>
+<!-- Auto-Lock App -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">lock_clock</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Auto-Lock App</div>
+<div class="text-xs text-on-surface-variant">Immediate upon leaving screen</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-medium text-on-surface-variant">Immediately</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+<!-- Cloud-Free Export -->
+<div class="p-3.5 flex items-center justify-between hover:bg-surface-container-low/40 transition cursor-pointer active:bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">cloud_off</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Backup &amp; Cloud-Free Export</div>
+<div class="text-xs text-on-surface-variant">Encrypted .evault file generation</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Minimal Privacy Guarantee Footer Badge -->
+<div class="mt-2 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 border border-primary/15 rounded-2xl p-4 flex items-center gap-3.5 shadow-xs">
+<div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+</div>
+<div>
+<div class="text-xs font-bold uppercase tracking-wider text-primary">100% On-Device &amp; Offline Enclave</div>
+<p class="text-xs text-on-surface-variant mt-0.5 leading-relaxed">
+          Zero remote servers. No tracking telemetry. Your document expiries never leave this phone.
+        </p>
+</div>
+</div>
+<!-- App Version Tag -->
+<div class="text-center pt-2 pb-4">
+<div class="text-xs text-outline">ExpiryVault v2.4.0 • Build 8421</div>
+</div>
+</main>
+<!-- Clean Bottom Tab Bar (mobile_tab) -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-white/95 backdrop-blur-xl border-t border-outline-variant/70 shadow-lg">
+<div class="h-16 px-4 flex items-center justify-around">
+<!-- Vault -->
+<a class="flex flex-col items-center justify-center min-w-[48px] py-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">inventory_2</span>
+<span class="text-[11px] font-medium tracking-tight mt-0.5">Vault</span>
+</a>
+<!-- Scan -->
+<a class="flex flex-col items-center justify-center min-w-[48px] py-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">qr_code_scanner</span>
+<span class="text-[11px] font-medium tracking-tight mt-0.5">Scan</span>
+</a>
+<!-- Timeline -->
+<a class="flex flex-col items-center justify-center min-w-[48px] py-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">event_upcoming</span>
+<span class="text-[11px] font-medium tracking-tight mt-0.5">Timeline</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center min-w-[48px] py-1 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_circle</span>
+<span class="text-[11px] font-medium tracking-tight mt-0.5">Profile</span>
+</a>
+<!-- Settings (Active) -->
+<a aria-current="page" class="flex flex-col items-center justify-center min-w-[54px] py-1 text-primary transition-all" href="#">
+<div class="w-9 h-7 rounded-full bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-primary">settings</span>
+</div>
+<span class="text-[11px] font-semibold text-primary tracking-tight mt-0.5">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Minimal JavaScript for toggles -->
+<script>
+    document.querySelectorAll('.toggle-switch').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const isEnabled = toggle.getAttribute('data-enabled') === 'true';
+        const thumb = toggle.querySelector('span');
+        if (isEnabled) {
+          toggle.setAttribute('data-enabled', 'false');
+          toggle.classList.remove('bg-primary');
+          toggle.classList.add('bg-outline-variant');
+          thumb.classList.remove('right-0.5');
+          thumb.classList.add('left-0.5');
+        } else {
+          toggle.setAttribute('data-enabled', 'true');
+          toggle.classList.remove('bg-outline-variant');
+          toggle.classList.add('bg-primary');
+          thumb.classList.remove('left-0.5');
+          thumb.classList.add('right-0.5');
+        }
+      });
+    });
+  </script>
+</body></html>

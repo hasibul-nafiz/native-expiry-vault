@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_stack" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-surface": "#0f172a",
+            "on-surface-variant": "#64748b",
+            "primary": "#4f46e5",
+            "primary-container": "#6366f1",
+            "surface": "#f7f7fc",
+            "card-border": "rgba(99, 102, 241, 0.09)",
+            "icon-bg": "#eef2ff",
+            "tertiary": "#059669"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          },
+          boxShadow: {
+            'subtle': '0 4px 20px -2px rgba(99, 102, 241, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+            'card-active': '0 10px 25px -4px rgba(79, 70, 229, 0.12), 0 4px 8px -2px rgba(79, 70, 229, 0.06)',
+            'floating': '0 -4px 24px -2px rgba(15, 23, 42, 0.06)'
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f7fc;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+        font-family: 'Inter', sans-serif;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-[#f7f7fc] text-[#0f172a] flex flex-col min-h-screen selection:bg-indigo-500 selection:text-white antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 inset-x-0 z-40 bg-[#f7f7fc]/90 backdrop-blur-md pt-safe border-b border-indigo-50/60">
+<div class="h-14 px-4 flex items-center justify-between">
+<button class="text-[#64748b] hover:text-[#0f172a] font-medium text-[15px] px-1 py-1 transition-colors" onclick="history.back()">
+        Cancel
+      </button>
+<div class="flex flex-col items-center">
+<h1 class="text-[17px] font-semibold tracking-tight text-[#0f172a]">New Document</h1>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="text-[11px] font-medium text-[#64748b]">AES-256 Client Vault</span>
+</div>
+</div>
+<button class="text-indigo-600 hover:text-indigo-700 font-semibold text-[15px] px-2 py-1 transition-colors" id="headerSaveBtn">
+        Save
+      </button>
+</div>
+</header>
+<!-- Main Content Flow -->
+<main class="flex-1 flex flex-col relative w-full pt-16 pb-36 px-4 max-w-lg mx-auto">
+<!-- Modal Grip Indicator -->
+<div class="flex justify-center pt-2 pb-3">
+<div class="w-10 h-1 rounded-full bg-slate-300/70"></div>
+</div>
+<!-- Step Progress Tracker (4 Steps) -->
+<div class="bg-white rounded-2xl p-4 shadow-subtle border border-indigo-100/50 mb-5">
+<div class="flex items-center justify-between mb-2.5">
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full" id="stepProgressLabel">Step 1 of 4: Category</span>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+<span class="material-symbols-outlined text-[13px] text-emerald-600">lock</span>
+<span>Zero-Cloud Enclave</span>
+</div>
+</div>
+<!-- Linear Bars -->
+<div class="grid grid-cols-4 gap-2 w-full mb-3">
+<div class="h-1.5 rounded-full bg-indigo-600 transition-all shadow-sm" id="bar-step-1"></div>
+<div class="h-1.5 rounded-full bg-slate-100 transition-all" id="bar-step-2"></div>
+<div class="h-1.5 rounded-full bg-slate-100 transition-all" id="bar-step-3"></div>
+<div class="h-1.5 rounded-full bg-slate-100 transition-all" id="bar-step-4"></div>
+</div>
+<!-- Quick Step Navigation Pills -->
+<div class="flex justify-between items-center text-[12px] font-medium text-slate-400 pt-0.5">
+<button class="flex items-center gap-1 text-indigo-600 font-semibold transition-colors" onclick="goToStep(1)">
+<span class="material-symbols-outlined text-[15px]">grid_view</span> Category
+        </button>
+<button class="flex items-center gap-1 hover:text-slate-600 transition-colors" onclick="goToStep(2)">
+<span class="material-symbols-outlined text-[15px]">document_scanner</span> Capture
+        </button>
+<button class="flex items-center gap-1 hover:text-slate-600 transition-colors" onclick="goToStep(3)">
+<span class="material-symbols-outlined text-[15px]">verified</span> Verify
+        </button>
+<button class="flex items-center gap-1 hover:text-slate-600 transition-colors" onclick="goToStep(4)">
+<span class="material-symbols-outlined text-[15px]">notifications_active</span> Alerts
+        </button>
+</div>
+</div>
+<!-- STEP 1: CATEGORY SELECTION -->
+<section class="step-view flex flex-col gap-4" id="step-1">
+<div class="flex items-center justify-between px-1">
+<div>
+<h2 class="text-xl font-bold text-[#0f172a] tracking-tight">Select Category</h2>
+<p class="text-xs text-[#64748b] mt-0.5">Presets calibrate smart reminders automatically</p>
+</div>
+<span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-2.5 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Auto-Template
+        </span>
+</div>
+<!-- 2-Column Category Grid -->
+<div class="grid grid-cols-2 gap-3.5">
+<!-- Passport / ID (Active by default) -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border-2 border-indigo-600 shadow-card-active transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+</div>
+<span class="cat-check w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Passport / ID</span>
+<span class="text-[12px] text-[#64748b] font-normal">6-mo airline rule</span>
+</div>
+</button>
+<!-- Visa & Permit -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border border-slate-200/70 hover:border-indigo-300 shadow-subtle hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">flight_takeoff</span>
+</div>
+<span class="cat-check hidden w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Visa &amp; Permit</span>
+<span class="text-[12px] text-[#64748b] font-normal">Schengen / Status</span>
+</div>
+</button>
+<!-- Health & Travel -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border border-slate-200/70 hover:border-indigo-300 shadow-subtle hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">medical_services</span>
+</div>
+<span class="cat-check hidden w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Health &amp; Travel</span>
+<span class="text-[12px] text-[#64748b] font-normal">Global coverage</span>
+</div>
+</button>
+<!-- Driver's License -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border border-slate-200/70 hover:border-indigo-300 shadow-subtle hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">directions_car</span>
+</div>
+<span class="cat-check hidden w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Driver's License</span>
+<span class="text-[12px] text-[#64748b] font-normal">IDP &amp; Local</span>
+</div>
+</button>
+<!-- Warranty / Tech -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border border-slate-200/70 hover:border-indigo-300 shadow-subtle hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">receipt_long</span>
+</div>
+<span class="cat-check hidden w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Warranty / Tech</span>
+<span class="text-[12px] text-[#64748b] font-normal">Hardware claims</span>
+</div>
+</button>
+<!-- Lease & Contract -->
+<button class="category-card group relative text-left p-4 rounded-2xl bg-white border border-slate-200/70 hover:border-indigo-300 shadow-subtle hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[126px]" onclick="selectCategory(this)" type="button">
+<div class="flex items-start justify-between w-full">
+<div class="w-10 h-10 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined text-[22px]">history_edu</span>
+</div>
+<span class="cat-check hidden w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+</span>
+</div>
+<div>
+<span class="text-[15px] font-semibold text-[#0f172a] block tracking-tight">Lease &amp; Contract</span>
+<span class="text-[12px] text-[#64748b] font-normal">Apartment / Rent</span>
+</div>
+</button>
+</div>
+<!-- Feature highlight card -->
+<div class="bg-gradient-to-r from-indigo-50/70 via-purple-50/50 to-white rounded-2xl p-3.5 border border-indigo-100 flex items-center gap-3 mt-1">
+<div class="w-9 h-9 rounded-xl bg-white text-indigo-600 shadow-sm flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold text-[#0f172a]">Autonomous Document Safeguard</p>
+<p class="text-[11px] text-[#64748b]">Includes intelligent renewal windows &amp; biometric protection</p>
+</div>
+</div>
+</section>
+<!-- STEP 2: CAPTURE METHOD -->
+<section class="step-view hidden flex flex-col gap-4" id="step-2">
+<div>
+<h2 class="text-xl font-bold text-[#0f172a] tracking-tight">Capture Method</h2>
+<p class="text-xs text-[#64748b] mt-0.5">Instant parsing via on-device CoreML neural engine</p>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Option 1: Camera OCR -->
+<div class="capture-opt relative p-4 rounded-2xl bg-white border-2 border-indigo-600 shadow-card-active cursor-pointer flex items-start gap-3.5 transition-all" onclick="setCaptureMode(this)">
+<div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]">center_focus_strong</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="text-[15px] font-semibold text-[#0f172a]">Camera OCR Scan</span>
+<span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">RECOMMENDED</span>
+</div>
+<p class="text-xs text-[#64748b] mt-1 leading-relaxed">Point camera at MRZ or header. Instant date parser &amp; boundary alignment.</p>
+<div class="mt-2 flex items-center gap-1 text-indigo-600 text-[11px] font-semibold">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Instant Auto-Detection
+            </div>
+</div>
+</div>
+<!-- Option 2: Upload PDF/Image -->
+<div class="capture-opt relative p-4 rounded-2xl bg-white border border-slate-200/70 shadow-subtle hover:border-indigo-300 cursor-pointer flex items-start gap-3.5 transition-all" onclick="setCaptureMode(this)">
+<div class="w-11 h-11 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]">file_upload</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="text-[15px] font-semibold text-[#0f172a]">Upload PDF / Image</span>
+<p class="text-xs text-[#64748b] mt-1 leading-relaxed">Local Apple Files or Photo Library import without remote uploading.</p>
+</div>
+</div>
+<!-- Option 3: Manual Entry -->
+<div class="capture-opt relative p-4 rounded-2xl bg-white border border-slate-200/70 shadow-subtle hover:border-indigo-300 cursor-pointer flex items-start gap-3.5 transition-all" onclick="setCaptureMode(this)">
+<div class="w-11 h-11 rounded-xl bg-[#eef2ff] text-indigo-500 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]">edit_note</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="text-[15px] font-semibold text-[#0f172a]">Manual Entry</span>
+<p class="text-xs text-[#64748b] mt-1 leading-relaxed">Type document details directly without attaching a digital file.</p>
+</div>
+</div>
+</div>
+<!-- Preview card -->
+<div class="bg-white rounded-2xl p-3.5 border border-indigo-100 shadow-subtle flex items-center gap-3">
+<div class="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden relative flex-shrink-0 border border-slate-200/60">
+<img class="w-full h-full object-cover" data-alt="Close up biometric passport datapage showing security guilloche patterns, holographic emblem and dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs9_Bd-oIiE5zGk1zuMMYMkZfJ1hd8PPtJpeDfT2caQAQdUWDRUaxo12SncJ8biKDbjY11KLaAi2WhS8Fn_CngjLr3AbZB0wZzre8C2H-p-ErynBPhX9OygD6IDy6mlo74Vyqn7YaB-17Ay4QN-ExEF5nsv1HIRO8GKJhF1I6UgMk_LYvG06VhMufGEirryb17wv1B9gzrzf0Ee-ce1OfZ-iN9ggUgADS7wHXDcoqD"/>
+<div class="absolute inset-0 bg-indigo-950/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]">document_scanner</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<span class="text-xs font-semibold text-[#0f172a] block">Ready to parse document</span>
+<span class="text-[11px] text-[#64748b]">Simulated scanner ready for biometric ID</span>
+</div>
+<button class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-2 rounded-xl transition-colors flex items-center gap-1 border border-indigo-200/60" onclick="runSimulatedScan()" type="button">
+          Scan <span class="material-symbols-outlined text-[14px]">play_arrow</span>
+</button>
+</div>
+</section>
+<!-- STEP 3: VERIFIED FIELDS -->
+<section class="step-view hidden flex flex-col gap-4" id="step-3">
+<div class="flex items-center justify-between px-1">
+<div>
+<h2 class="text-xl font-bold text-[#0f172a] tracking-tight">Verified OCR Fields</h2>
+<p class="text-xs text-[#64748b] mt-0.5">Inspect and confirm parsed data</p>
+</div>
+<div class="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-semibold border border-emerald-200">
+<span class="material-symbols-outlined text-[14px]">shield</span> 99.4% Match
+        </div>
+</div>
+<div class="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-3.5 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-emerald-600 text-[20px] mt-0.5">check_circle</span>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold text-emerald-950">Detected via On-Device OCR (99.4%)</p>
+<p class="text-[11px] text-emerald-800/80 font-mono break-all mt-0.5">P&lt;FRAVERON&lt;&lt;CAMILLE&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-subtle flex flex-col gap-3.5">
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-semibold text-[#64748b] uppercase tracking-wider">Document Title</label>
+<div class="bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748b] text-[18px]">description</span>
+<input class="bg-transparent text-[#0f172a] text-[14px] font-medium w-full focus:outline-none" id="docTitle" type="text" value="Republic of France — Passport"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-[11px] font-semibold text-[#64748b] uppercase tracking-wider">Issuing Authority</label>
+<div class="bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2.5 flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748b] text-[18px]">account_balance</span>
+<input class="bg-transparent text-[#0f172a] text-[14px] font-medium w-full focus:outline-none" id="docAuthority" type="text" value="Prefecture de Police Paris"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="text-[11px] font-semibold text-[#64748b] uppercase tracking-wider">Expiry Date</label>
+<span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">2,633 Days Left</span>
+</div>
+<div class="bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-600 text-[18px]">event_available</span>
+<input class="bg-transparent text-[#0f172a] text-[14px] font-semibold focus:outline-none w-36" id="docExpiry" type="text" value="14 May 2031"/>
+</div>
+<button class="bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-medium hover:bg-slate-50 transition-colors flex items-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[14px]">edit_calendar</span> Change
+            </button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="text-[11px] font-semibold text-[#64748b] uppercase tracking-wider">Document / ID Number</label>
+<button class="text-[11px] font-semibold text-indigo-600 flex items-center gap-1 hover:underline" onclick="toggleDocMask()" type="button">
+<span class="material-symbols-outlined text-[14px]" id="maskIcon">visibility_off</span>
+<span id="maskLabel">Masked</span>
+</button>
+</div>
+<div class="bg-[#f8fafc] border border-slate-200 rounded-xl px-3 py-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748b] text-[18px]">pin</span>
+<input class="bg-transparent text-[#0f172a] text-[14px] font-semibold tracking-wider focus:outline-none" id="docNumber" readonly="" type="text" value="•••• 9284"/>
+</div>
+<span class="material-symbols-outlined text-emerald-600 text-[18px]">lock</span>
+</div>
+</div>
+</div>
+</section>
+<!-- STEP 4: REMINDER RULES -->
+<section class="step-view hidden flex flex-col gap-4" id="step-4">
+<div class="px-1">
+<h2 class="text-xl font-bold text-[#0f172a] tracking-tight">Intelligent Reminders</h2>
+<p class="text-xs text-[#64748b] mt-0.5">Multi-stage push notifications &amp; travel rule mitigations</p>
+</div>
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-subtle flex flex-col gap-2.5">
+<span class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider mb-1">Preset Alerts</span>
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors border border-transparent hover:border-slate-200/50">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" type="checkbox"/>
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">6 Months Before</span>
+<span class="text-[11px] text-emerald-600 font-medium">Recommended for airline renewal compliance</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-[#64748b]">Nov 14, 2030</span>
+</label>
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors border border-transparent hover:border-slate-200/50">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" type="checkbox"/>
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">3 Months Before</span>
+<span class="text-[11px] text-[#64748b]">Consulate appointment booking lead window</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-[#64748b]">Feb 14, 2031</span>
+</label>
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors border border-transparent hover:border-slate-200/50">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" type="checkbox"/>
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">30 Days Before</span>
+<span class="text-[11px] text-[#64748b]">Final grace window for travel processing</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-[#64748b]">Apr 14, 2031</span>
+</label>
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors border border-transparent hover:border-slate-200/50">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" type="checkbox"/>
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">7 Days Before</span>
+<span class="text-[11px] text-rose-500 font-medium">Urgent final countdown alert</span>
+</div>
+</div>
+<span class="text-[11px] font-medium text-[#64748b]">May 7, 2031</span>
+</label>
+</div>
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-subtle flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">Escalation Mode</span>
+<span class="text-[11px] text-[#64748b]">Daily persistent alerts when &lt; 14 days remaining</span>
+</div>
+<button class="w-11 h-6 bg-indigo-600 rounded-full p-0.5 transition-colors relative flex items-center" id="toggleEscalation" onclick="toggleSwitch(this)" type="button">
+<div class="w-5 h-5 bg-white rounded-full transform translate-x-5 transition-transform shadow-sm"></div>
+</button>
+</div>
+<div class="h-px bg-slate-100 w-full"></div>
+<div class="flex items-center justify-between">
+<div>
+<span class="text-xs font-semibold text-[#0f172a] block">Delivery Time</span>
+<span class="text-[11px] text-[#64748b]">Morning executive digest</span>
+</div>
+<span class="bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-1 rounded-lg text-xs border border-indigo-100">
+            09:00 AM
+          </span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Sticky Action Dock (Light Mode Airy Bottom Sheet) -->
+<footer class="fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-xl border-t border-indigo-50/80 px-4 pt-3 pb-safe shadow-floating">
+<div class="max-w-lg mx-auto flex flex-col gap-2.5">
+<!-- Security badge / metadata -->
+<div class="flex items-center justify-center gap-1.5 text-[#64748b] text-[11px] font-medium">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">verified_user</span>
+<span>AES-256 On-Device Enclave • Biometric Key Sealed</span>
+</div>
+<!-- Action Button Row -->
+<div class="flex items-center gap-2 w-full pb-1">
+<button class="hidden h-12 px-4 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-colors flex items-center justify-center" id="backBtn" onclick="stepBack()" type="button">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+</button>
+<!-- Violet Gradient CTA -->
+<button class="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-[15px] shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99]" id="mainActionBtn" onclick="nextStepAction()" type="button">
+<span id="mainActionText">Next: Capture Document</span>
+<span class="material-symbols-outlined text-[18px]" id="mainActionIcon">arrow_forward</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Toast Notification -->
+<div class="hidden fixed bottom-24 inset-x-4 max-w-sm mx-auto bg-[#0f172a] text-white p-3.5 rounded-2xl shadow-2xl flex items-center gap-3 z-50 animate-bounce" id="saveToast">
+<div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold text-white">Encrypted &amp; Vaulted</p>
+<p class="text-[11px] text-slate-300">Document protected under local biometrics key</p>
+</div>
+</div>
+<script>
+    let currentStep = 1;
+    let isMasked = true;
+    let escalationActive = true;
+
+    function updateUI(step) {
+      currentStep = step;
+      const stepNames = ['Category', 'Capture', 'Verify', 'Reminders'];
+      const actionTexts = [
+        'Next: Capture Document',
+        'Continue to Verify',
+        'Setup Reminders',
+        'Encrypt & Save to Vault'
+      ];
+      const actionIcons = ['arrow_forward', 'arrow_forward', 'arrow_forward', 'lock'];
+
+      document.getElementById('stepProgressLabel').innerText = `Step ${step} of 4: ${stepNames[step - 1]}`;
+
+      // Update progress bar
+      for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById(`bar-step-${i}`);
+        if (i <= step) {
+          bar.className = 'h-1.5 rounded-full bg-indigo-600 transition-all shadow-sm';
+        } else {
+          bar.className = 'h-1.5 rounded-full bg-slate-100 transition-all';
+        }
+      }
+
+      // Update views
+      document.querySelectorAll('.step-view').forEach(view => view.classList.add('hidden'));
+      const target = document.getElementById(`step-${step}`);
+      if (target) {
+        target.classList.remove('hidden');
+      }
+
+      // Update CTA buttons
+      const mainActionText = document.getElementById('mainActionText');
+      const mainActionIcon = document.getElementById('mainActionIcon');
+      const backBtn = document.getElementById('backBtn');
+
+      mainActionText.innerText = actionTexts[step - 1];
+      mainActionIcon.innerText = actionIcons[step - 1];
+
+      if (step > 1) {
+        backBtn.classList.remove('hidden');
+      } else {
+        backBtn.classList.add('hidden');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToStep(step) {
+      updateUI(step);
+    }
+
+    function stepBack() {
+      if (currentStep > 1) {
+        goToStep(currentStep - 1);
+      }
+    }
+
+    function nextStepAction() {
+      if (currentStep < 4) {
+        goToStep(currentStep + 1);
+      } else {
+        completeVaultSave();
+      }
+    }
+
+    function selectCategory(el) {
+      document.querySelectorAll('.category-card').forEach(card => {
+        card.classList.remove('border-2', 'border-indigo-600', 'shadow-card-active');
+        card.classList.add('border', 'border-slate-200/70', 'shadow-subtle');
+        const iconWrap = card.querySelector('div > div');
+        if (iconWrap) {
+          iconWrap.classList.remove('bg-indigo-50', 'text-indigo-600');
+          iconWrap.classList.add('bg-[#eef2ff]', 'text-indigo-500');
+        }
+        const check = card.querySelector('.cat-check');
+        if (check) check.classList.add('hidden');
+      });
+
+      el.classList.remove('border', 'border-slate-200/70', 'shadow-subtle');
+      el.classList.add('border-2', 'border-indigo-600', 'shadow-card-active');
+      const activeIcon = el.querySelector('div > div');
+      if (activeIcon) {
+        activeIcon.classList.remove('bg-[#eef2ff]', 'text-indigo-500');
+        activeIcon.classList.add('bg-indigo-50', 'text-indigo-600');
+      }
+      const check = el.querySelector('.cat-check');
+      if (check) check.classList.remove('hidden');
+    }
+
+    function setCaptureMode(el) {
+      document.querySelectorAll('.capture-opt').forEach(opt => {
+        opt.classList.remove('border-2', 'border-indigo-600', 'shadow-card-active');
+        opt.classList.add('border', 'border-slate-200/70', 'shadow-subtle');
+        const iconWrap = opt.querySelector('div');
+        if (iconWrap) {
+          iconWrap.classList.remove('bg-indigo-50', 'text-indigo-600');
+          iconWrap.classList.add('bg-[#eef2ff]', 'text-indigo-500');
+        }
+      });
+
+      el.classList.remove('border', 'border-slate-200/70', 'shadow-subtle');
+      el.classList.add('border-2', 'border-indigo-600', 'shadow-card-active');
+      const activeIcon = el.querySelector('div');
+      if (activeIcon) {
+        activeIcon.classList.remove('bg-[#eef2ff]', 'text-indigo-500');
+        activeIcon.classList.add('bg-indigo-50', 'text-indigo-600');
+      }
+    }
+
+    function toggleDocMask() {
+      isMasked = !isMasked;
+      const input = document.getElementById('docNumber');
+      const icon = document.getElementById('maskIcon');
+      const label = document.getElementById('maskLabel');
+      if (isMasked) {
+        input.value = '•••• 9284';
+        icon.innerText = 'visibility_off';
+        label.innerText = 'Masked';
+      } else {
+        input.value = '21AF99284';
+        icon.innerText = 'visibility';
+        label.innerText = 'Revealed';
+      }
+    }
+
+    function toggleSwitch(btn) {
+      escalationActive = !escalationActive;
+      const thumb = btn.firstElementChild;
+      if (escalationActive) {
+        btn.classList.remove('bg-slate-200');
+        btn.classList.add('bg-indigo-600');
+        thumb.classList.remove('translate-x-0');
+        thumb.classList.add('translate-x-5');
+      } else {
+        btn.classList.remove('bg-indigo-600');
+        btn.classList.add('bg-slate-200');
+        thumb.classList.remove('translate-x-5');
+        thumb.classList.add('translate-x-0');
+      }
+    }
+
+    function runSimulatedScan() {
+      goToStep(3);
+    }
+
+    function completeVaultSave() {
+      const toast = document.getElementById('saveToast');
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+
+    document.getElementById('headerSaveBtn').addEventListener('click', function() {
+      completeVaultSave();
+    });
+  </script>
+</body></html>
