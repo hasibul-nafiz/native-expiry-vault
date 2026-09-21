@@ -1,25 +1,24 @@
-import { router } from 'expo-router';
+import { Redirect } from 'expo-router';
 
-import { Button, Screen, Text } from '@/components';
+import { LockScreen } from '@/features/lock/LockScreen';
 import { useLockState } from '@/features/lock/useLockState';
 
 /**
- * Placeholder gate. F9 replaces the body with the biometric prompt, PIN keypad
- * and recovery options the export draws; the route and the unlock contract stay
- * as they are.
+ * The gate. `(app)/_layout.tsx` redirects here whenever the vault is locked;
+ * this redirects back once it is not, which is what makes a successful unlock
+ * navigate without the screen itself knowing any routes.
+ *
+ * It returns to the root rather than to wherever the user was. A pending
+ * notification deep link is picked up by `ReminderRuntime` as it remounts
+ * behind the gate, so a reminder tapped on a locked phone still lands on its
+ * document.
  */
-export default function LockScreen() {
-  const { unlock } = useLockState();
+export default function LockRoute() {
+  const { isLocked } = useLockState();
 
-  const handleUnlock = () => {
-    unlock();
-    router.replace('/');
-  };
+  if (!isLocked) {
+    return <Redirect href="/" />;
+  }
 
-  return (
-    <Screen>
-      <Text variant="headlineMd">Locked</Text>
-      <Button label="Unlock" onPress={handleUnlock} testID="unlock-button" />
-    </Screen>
-  );
+  return <LockScreen />;
 }

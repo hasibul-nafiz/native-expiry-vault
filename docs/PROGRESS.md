@@ -1,9 +1,9 @@
 # ExpiryVault Progress
 
 ## Current
-Feature: none started (F8 complete)
-Branch: feat/foundation (F0-F8 all landed here, not on main)
-Next: F9 App lock (biometric + PIN)
+Feature: none started (F9 complete)
+Branch: feat/foundation (F0-F9 all landed here, not on main)
+Next: F10 Timeline + vault health screens
 
 ## Features
 Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
@@ -17,7 +17,7 @@ Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
 - [x] F6  Item detail, edit, delete, mark renewed
 - [x] F7  Reminder engine + notifications
 - [x] F8  Scan + OCR + date parser
-- [ ] F9  App lock (biometric + PIN)
+- [x] F9  App lock (biometric + PIN)
 - [ ] F10 Timeline + vault health screens
 - [ ] F11 Settings, i18n, 
 - [ ] F12 Backup/export/restore
@@ -140,6 +140,29 @@ permissions strings, privacy policy, EAS submit)
 - 2026-09-20: `jest.config.js` gained `testPathIgnorePatterns` for `__tests__/fixtures/` — the preset treats every file under `__tests__` as a suite, and F8's parser fixtures are shared data.
 - 2026-09-20: Reminder state is a module-level `useSyncExternalStore` like the lock, so any screen can ask for a resync without threading a callback; the state-library choice stays F11's.
 
+- 2026-09-21: `expo-local-authentication` added (named in CLAUDE.md's stack, never installed by F0), plus `expo-screen-capture` for Android FLAG_SECURE and `@noble/hashes` for PBKDF2 — three dependencies, each justified below.
+- 2026-09-21: `@noble/hashes` (audited, pure TS, zero runtime deps) rather than stretching with `expo-crypto`: a six-digit PIN is a space of 10^6, and `digestStringAsync` is the only primitive expo-crypto offers, so a useful iteration count would mean thousands of async bridge round-trips. Single-round SHA-256 was the alternative and is exhausted in milliseconds.
+- 2026-09-21: `PBKDF2_ITERATIONS = 100_000`, well under OWASP's 600,000 — that figure costs seconds in JS on Hermes. The stored record carries its own `iterations`, and `verifyPin` uses the record's value, so the count can be re-tuned after device measurement without invalidating existing enrolments.
+- 2026-09-21: The PIN hash is the second lock, not the first. It sits in the Keychain beside the SQLCipher key, so anyone who can read it can already read the vault; the stretching buys time against an offline attack on a stolen record, and nothing more.
+- 2026-09-21: `jest.config.js` rewrites the preset's `transformIgnorePatterns` to add `@noble` rather than restating the allowlist, so a jest-expo upgrade that extends that list is not silently reverted here.
+- 2026-09-21: `LockStatus` has three values. Reading the PIN record is async, so `unknown` holds the splash in `app/_layout.tsx`; defaulting to unlocked rendered the dashboard for a frame before hiding it.
+- 2026-09-21: `lockVault()` is a no-op when no PIN is enrolled — otherwise an auto-lock strands the user on a gate with nothing to verify them against. Asserted separately.
+- 2026-09-21: App lock is opt-in. No PIN means no gate, no prompt and no FLAG_SECURE; blocking every Android screenshot for a user who declined the lock is a cost with no matching benefit.
+- 2026-09-21: Grace period is 60s and only a true `background` starts it. iOS reports `inactive` for the app-switcher peek, Control Centre — and the Face ID sheet itself, so starting the timer there would have the prompt re-lock the vault it was opening. The store carries an `authenticating` flag the listener respects, for Android's BiometricPrompt, which genuinely backgrounds the app.
+- 2026-09-21: `shouldShieldContent` and `startsGracePeriod` are two predicates over the same `AppState` precisely because they disagree on `inactive`: the shield must be up for it, the timer must not start on it. Collapsing them into one is the bug the split exists to prevent.
+- 2026-09-21: Backoff is 5 free attempts then 30s/1m/5m/15m/30m, persisted to secure-store — a counter a force-quit resets is not a delay. No wipe-after-N: the vault is the user's only copy, and destroying it over nine mistypes is a larger loss than the attack it prevents.
+- 2026-09-21: `remainingLockoutMs` clamps to the duration that was imposed, so winding the clock back restarts the wait instead of stranding the user for years. Winding it forward still skips the lockout; that needs a monotonic clock the platform does not offer, and is logged rather than pretended away.
+- 2026-09-21: A failed biometric does not spend a PIN attempt. The sensor runs its own lockout, and a face the camera misread is not evidence of someone guessing the PIN. A biometric reported `unavailable` stops being offered at all.
+- 2026-09-21: Biometrics are not offered while a timeout is running — otherwise they are a way straight past the backoff.
+- 2026-09-21: `disableDeviceFallback: true` and `biometricsSecurityLevel: 'strong'`. The app's own PIN is the fallback, so the OS must not also offer the device passcode, which proves nothing about this vault; and a Class 2 camera face unlock is weaker than the six digits it would bypass.
+- 2026-09-21: Weak PINs are refused at enrolment (repeats, ±1 runs, and a twelve-entry denylist). Backoff cannot protect a PIN that is inside the first five guesses on any published list.
+- 2026-09-21: A malformed PIN record parses to `null` — "no PIN enrolled" — where a malformed database key raises. The key is irreplaceable and overwriting it destroys the vault; the PIN record is a verifier for a secret the user still knows, so leaving them permanently unable to enrol is the worse failure.
+- 2026-09-21: `src/services/biometrics.ts` and `src/services/screenCapture.ts` are the only importers of their libraries, the same containment `notifications.ts` and `Icon.tsx` give — which is what makes every unlock path testable with no hardware.
+- 2026-09-21: `blockedPermissions` gained READ_EXTERNAL_STORAGE, READ_MEDIA_IMAGES and DETECT_SCREEN_CAPTURE. `expo-screen-capture` declares all three for its screenshot-*detection* API, which F9 never calls; left in, they advertise gallery access on the Play listing of an app that does not read the gallery, and READ_MEDIA_IMAGES obliges a Play Console declaration for something the app does not do.
+- 2026-09-21: `buildPinRecord` takes `iterations` as a parameter so component tests run the real derivation and comparison at a token count. At full strength one screen test that mistypes a PIN five times spends several seconds deriving; `pin.test.ts` is what pins the shipped constant.
+- 2026-09-21: `dev-gallery` and `dev-seed` moved into `(app)`. Route groups carry no URL segment, so the paths are unchanged, but they are now behind the gate — this closes F3's logged "revisit at F9".
+- 2026-09-21: Settings gained one real row linking to enrolment. F9's flow is unreachable without an entry point and Settings is where it belongs; F11 restyles it with the rest of that screen.
+
 ### F1 dark-palette assumptions
 The Stitch export has no dark reference at all, so the dark palette is derived. Tier 1 is verbatim; tiers 2 and 3 are the assumptions:
 - Dark `primary`/`secondary`/`tertiary` and their containers are lifted verbatim from the `inverse-*` and `*-fixed*` tokens, which are M3's dark-side values — not invented.
@@ -202,6 +225,18 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - Only `expo-glass-effect`, `expo-device` and `expo-web-browser` remain unused from F0.
 - All F8 strings are inline English; i18n arrives at F11.
 
+- ~~`app/dev-gallery.tsx` sits outside both route groups, so it is reachable without passing the lock gate. Harmless while the gate is a placeholder; revisit at F9.~~ Resolved at F9: both dev routes moved into `(app)`, asserted by a navigation test.
+- F9's iOS app-switcher cover is best-effort and is the weakest claim in the feature. The snapshot is taken at `resignActive` and React Native cannot promise a commit before then, so a fast enough swipe can capture the frame underneath. Closing it needs a native view added in `AppDelegate` via a config plugin — deliberately not written without a device to verify it on. Android is solid: FLAG_SECURE blanks the recents thumbnail outright.
+- The PBKDF2 cost is unmeasured on real hardware. 100,000 iterations is ~100ms in Node and unknown on Hermes, where it could plausibly be 1-2s on an older Android. If it is, lower `PBKDF2_ITERATIONS` — the stored record is self-describing, so existing enrolments keep working.
+- The lock is a UI gate, not a crypto boundary. `DatabaseProvider` opens the database above the gate, so it is decrypted and open while locked. Making it a real boundary means `requireAuthentication: true` on the SQLCipher key (deferred at F2), which gates cold start on biometrics and stops the reminder scheduler running at launch. Not attempted here.
+- Winding the device clock forward skips a lockout. There is no monotonic clock available, so the backoff can only be honest about it; winding backwards is handled and tested.
+- Biometric hardware, the Keychain round-trip, the real app-switcher snapshot and FLAG_SECURE are all unverifiable in Jest. F9 needs `npx expo run:ios` / `run:android`, plus a device with Face ID or a fingerprint enrolled and one with neither.
+- `NSFaceIDUsageDescription` is declared through the `expo-local-authentication` plugin but has not been checked against a real prebuild — the same gap F7 logged for `blockedPermissions`, now covering four more blocked permissions.
+- `/set-pin` is a new route, so `npm run typecheck` will only check the link once the dev server has regenerated `.expo/types/router.d.ts`. Until then it falls back to `string`.
+- There is no PIN recovery, by design and by necessity: the data is local-only and the PIN is not the database key, so "forgot" can only mean erase and start over. Revisit at F12, when backup/restore gives it something to restore from.
+- All F9 strings are inline English, collected in `src/features/lock/labels.ts` so F11's extraction is one file.
+- Biometrics cannot be turned off independently of the PIN. If hardware is enrolled with the OS, the prompt is offered; a separate toggle belongs with F11's settings.
+
 ## Design gaps
 - No Android variants or dark mode in the Stitch export
 - Design system is named "Lumina FinTech" (rename to ExpiryVault)
@@ -244,6 +279,19 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - Its "MRZ Auto-Lock" badge implies live frame analysis; the library reads image files, so auto mode is a capped polling loop instead
 - Its Batch Scan mode has no behaviour at all and is not built
 - Its document-type dropdown (Passport / Visa / National ID / Insurance Policy) changes nothing in the export
+
+- The lock export states "Your offline vault is locked with AES-256 GCM encryption". It is not: the vault is SQLCipher, which is AES-256-CBC with HMAC-SHA512. Not ported — a false crypto claim in the UI of a privacy-first app is the worst line in the export
+- Its "ZERO-KNOWLEDGE STORAGE" badge is a term with a specific meaning that does not apply to a local encrypted SQLite file. Not ported
+- Its profile card (avatar, "Isha Manzoor", "Encrypted Enclave") requires a profile that exists nowhere in the schema — the same gap F4 logged and declined to invent. Not ported
+- Its "v2.4" pill is fabricated and matches no version the app has. Not ported
+- Its "Restore from airgapped seed phrase" needs a seed phrase that does not exist anywhere in the product and cannot be added without redesigning the database key. Not ported
+- Its "Forgot PIN?" implies a recovery path that cannot exist while the data is local-only and the PIN is not the database key. Not ported; revisit at F12
+- Its keypad prints dialler letters (ABC, DEF) and a "+" under the zero. Nothing dials and a PIN cannot be spelled. Not ported
+- Its gradient CTA stays a solid `primary` fill; F1's deferral of `expo-linear-gradient` is not reversed inside a feature
+- It hardcodes "Unlock with Face ID" on every device. F9 derives the label from the enrolled hardware and renders no button at all when there is none
+- It has no enrolment screen anywhere — choosing, confirming and removing a PIN were all designed for F9, not ported
+- It defines no wrong-PIN state, no timeout state, no error copy, no disabled state and no dark mode; every one of those was designed
+- Its only JavaScript increments a counter and swaps CSS classes: no verification, no storage, no biometric call, and the Face ID buttons simply fill all six dots
 
 ## Device test log
 (Feature, iOS version/device, Android version/device, result)

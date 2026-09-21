@@ -12,8 +12,23 @@
  */
 process.env.TZ = 'America/New_York';
 
+/**
+ * `@noble/hashes` (F9's PBKDF2) ships ES modules only, and the preset tells
+ * Babel to skip everything in `node_modules` bar a short allowlist. Extending
+ * that list by rewriting it, rather than restating it, means a jest-expo
+ * upgrade that adds a package to the allowlist does not silently drop it here.
+ */
+const preset = require('jest-expo/jest-preset');
+
+const transformIgnorePatterns = preset.transformIgnorePatterns.map((pattern) =>
+  pattern.startsWith('/node_modules/(?!(')
+    ? pattern.replace('/node_modules/(?!(', '/node_modules/(?!(@noble|')
+    : pattern,
+);
+
 module.exports = {
   preset: 'jest-expo',
+  transformIgnorePatterns,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

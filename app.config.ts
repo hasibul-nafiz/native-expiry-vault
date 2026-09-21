@@ -26,7 +26,22 @@ const config: ExpoConfig = {
       would fail if it did. The accepted cost is that Android may batch
       delivery around the 09:00 target, which an expiry reminder can absorb.
     */
-    blockedPermissions: ['android.permission.SCHEDULE_EXACT_ALARM'],
+    blockedPermissions: [
+      'android.permission.SCHEDULE_EXACT_ALARM',
+      /*
+        `expo-screen-capture` declares these three for its screenshot
+        *detection* API. F9 uses none of it — only `preventScreenCaptureAsync`,
+        and the FLAG_SECURE it sets needs no permission at all.
+
+        Left in, they would advertise media-library access on the Play listing
+        of an app that never reads the gallery through this module, and
+        READ_MEDIA_IMAGES additionally obliges a Play Console declaration for
+        something the app does not do.
+      */
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.DETECT_SCREEN_CAPTURE',
+    ],
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/images/android-icon-foreground.png',
@@ -45,6 +60,16 @@ const config: ExpoConfig = {
     // pages. It is unavailable in Expo Go, so a dev client build is required.
     ['expo-sqlite', { useSQLCipher: true }],
     'expo-secure-store',
+    [
+      'expo-local-authentication',
+      {
+        // NSFaceIDUsageDescription. iOS refuses the Face ID prompt outright
+        // without it, and the string is shown at the first attempt, so it has
+        // to explain the app lock rather than the technology.
+        faceIDPermission:
+          'ExpiryVault uses Face ID to unlock your vault, so you do not have to type your PIN every time.',
+      },
+    ],
     [
       'expo-image-picker',
       {

@@ -43,6 +43,14 @@ export default function AppLayout() {
           name="scan"
           options={{ headerShown: false, presentation: 'fullScreenModal' }}
         />
+        <Stack.Screen name="set-pin" options={{ presentation: 'modal', title: 'App lock' }} />
+        {/*
+          Dev-only routes. They sit inside this group rather than beside it so
+          the gate is total — F3 logged that their old home at the root made
+          them reachable without unlocking.
+        */}
+        <Stack.Screen name="dev-gallery" options={{ title: 'UI kit' }} />
+        <Stack.Screen name="dev-seed" options={{ title: 'Sample data' }} />
       </Stack>
     </Fragment>
   );

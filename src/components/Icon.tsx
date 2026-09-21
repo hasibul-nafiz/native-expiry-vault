@@ -18,7 +18,10 @@ import type { PaletteColor } from '@/theme';
 const glyphs = {
   add: 'add',
   alertActive: 'notifications-active',
+  backspace: 'backspace',
   bell: 'notifications',
+  biometricFace: 'face',
+  biometricFingerprint: 'fingerprint',
   category: 'badge',
   chevronRight: 'chevron-right',
   clear: 'close',
@@ -29,6 +32,7 @@ const glyphs = {
   health: 'health-and-safety',
   identity: 'contact-mail',
   licence: 'directions-car',
+  lock: 'lock',
   nextUp: 'hourglass-top',
   passport: 'public',
   reminder: 'event',

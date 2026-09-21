@@ -1,6 +1,42 @@
 import { renderRouter, screen } from 'expo-router/testing-library';
 
-import { lockVault, unlockVault } from '@/features/lock/useLockState';
+import { lockStorage } from '@/features/lock/lockStorage';
+import { initialiseLock, resetLockStore } from '@/features/lock/useLockState';
+
+/**
+ * The root layout bootstraps the lock from secure-store on mount, so seeding
+ * the store from a test would simply be overwritten. This replaces the storage
+ * the bootstrap reads through instead, leaving the real bootstrap, the real
+ * gate and the real redirect in the path being tested.
+ */
+jest.mock('@/features/lock/lockStorage', () => {
+  // `jest.mock` factories are hoisted above the imports.
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const { NO_FAILURES } = require('@/features/lock/backoff') as typeof import('@/features/lock/backoff');
+  const { buildPinRecord } = require('@/features/lock/pin') as typeof import('@/features/lock/pin');
+  /* eslint-enable @typescript-eslint/no-require-imports */
+
+  let record: ReturnType<typeof buildPinRecord> | null = null;
+  let attempts = NO_FAILURES;
+
+  return {
+    lockStorage: {
+      readPinRecord: async () => record,
+      // One iteration: these tests are about routing, not key stretching.
+      writePin: async (pin: string) => {
+        record = buildPinRecord(pin, 'navigation-salt', 1);
+      },
+      deletePin: async () => {
+        record = null;
+        attempts = NO_FAILURES;
+      },
+      readAttempts: async () => attempts,
+      writeAttempts: async (next: typeof NO_FAILURES) => {
+        attempts = next;
+      },
+    },
+  };
+});
 
 /**
  * Route-level tests for the F3 shell.
@@ -24,10 +60,20 @@ function renderApp(initialUrl: string) {
   return renderRouter('app', { initialUrl, ...metrics });
 }
 
-afterEach(() => {
+afterEach(async () => {
   // The lock store is module-level, so it outlives a single render.
-  unlockVault();
+  await lockStorage.deletePin();
+  resetLockStore();
 });
+
+/**
+ * Puts a PIN on the vault, which is what makes the gate able to come up at all
+ * — F9 made locking a no-op when nothing is enrolled.
+ */
+async function enrolAndLock(): Promise<void> {
+  await lockStorage.writePin('284091');
+  await initialiseLock();
+}
 
 describe('tab routes', () => {
   it.each([
@@ -126,27 +172,37 @@ describe('unmatched routes', () => {
 });
 
 describe('the lock gate', () => {
-  it('renders the app when unlocked', async () => {
+  it('renders the app when no PIN is enrolled', async () => {
     renderApp('/');
 
     expect(await screen.findByTestId('notifications-button')).toBeOnTheScreen();
-    expect(screen.queryByText('Locked')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Welcome back')).not.toBeOnTheScreen();
   });
 
   it('redirects to the gate when locked', async () => {
-    lockVault();
+    await enrolAndLock();
     const router = renderApp('/');
 
-    expect(await screen.findByText('Locked')).toBeOnTheScreen();
+    expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
     expect(router.getPathname()).toBe('/lock');
   });
 
   it('sends a deep link into a locked app to the gate, not the target', async () => {
-    lockVault();
+    await enrolAndLock();
     const router = renderApp('/item/abc123');
 
-    expect(await screen.findByText('Locked')).toBeOnTheScreen();
+    expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
     expect(screen.queryByText('Item detail')).not.toBeOnTheScreen();
+    expect(router.getPathname()).toBe('/lock');
+  });
+
+  it('keeps the dev routes behind the gate', async () => {
+    // F3 logged that these sat outside both groups and so were reachable
+    // without unlocking. F9 moved them inside `(app)`.
+    await enrolAndLock();
+    const router = renderApp('/dev-gallery');
+
+    expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
     expect(router.getPathname()).toBe('/lock');
   });
 });

@@ -110,3 +110,29 @@ jest.mock('expo-camera', () => {
     ]),
   };
 });
+
+/**
+ * `expo-local-authentication`'s automock returns `undefined` from every query,
+ * which reads as "no hardware" only by accident. This says it explicitly: a
+ * device with no biometric sensor, which is the state every test that is not
+ * about biometrics should see. F9's own tests inject a `BiometricPort` fake and
+ * never reach this.
+ */
+jest.mock('expo-local-authentication', () => ({
+  AuthenticationType: { FINGERPRINT: 1, FACIAL_RECOGNITION: 2, IRIS: 3 },
+  SecurityLevel: { NONE: 0, SECRET: 1, BIOMETRIC_WEAK: 2, BIOMETRIC_STRONG: 3 },
+  hasHardwareAsync: jest.fn(async () => false),
+  isEnrolledAsync: jest.fn(async () => false),
+  supportedAuthenticationTypesAsync: jest.fn(async () => []),
+  authenticateAsync: jest.fn(async () => ({ success: false, error: 'not_available' })),
+}));
+
+/**
+ * `expo-screen-capture` sets a native window flag with nothing to observe from
+ * JS. Inert doubles keep `PrivacyShield`'s effect from throwing in every test
+ * that mounts the root layout.
+ */
+jest.mock('expo-screen-capture', () => ({
+  preventScreenCaptureAsync: jest.fn(async () => undefined),
+  allowScreenCaptureAsync: jest.fn(async () => undefined),
+}));

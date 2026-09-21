@@ -9,6 +9,5 @@ export default function DevGalleryRoute() {
   if (!__DEV__) {
     return null;
   }
-
   return <Gallery />;
 }
