@@ -25,7 +25,7 @@ export default function ScanTabScreen() {
   }, [router]);
 
   return (
-    <Screen>
+    <Screen tabBar>
       <View style={{ gap: theme.spacing.md }}>
         <Icon color="primary" name="search" size={32} />
         <Text accessibilityRole="header" variant="headlineMd">

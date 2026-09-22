@@ -5,7 +5,7 @@ import type { IsoDate, Item } from '@/db/models';
 import { daysUntilExpiry, documentStatus, lifetimeElapsed } from '@/features/expiry';
 import { useTranslation } from 'react-i18next';
 
-import { useTheme } from '@/theme';
+import { MAX_LAYOUT_SCALE, useScaledSize, useTheme } from '@/theme';
 
 import { daysLeftLabel } from '../../dashboard/selectors';
 
@@ -23,6 +23,9 @@ import { daysLeftLabel } from '../../dashboard/selectors';
 
 const FALLBACK_WINDOW_DAYS = 365;
 
+/** The export draws the ring at 176. It scales with the text set inside it. */
+const RING_SIZE = 176;
+
 export interface CountdownHeroProps {
   item: Item;
   today: IsoDate;
@@ -37,6 +40,7 @@ const statusKeys = {
 export function CountdownHero({ item, today }: CountdownHeroProps) {
   const theme = useTheme();
   const { t } = useTranslation();
+  const ringSize = useScaledSize(RING_SIZE);
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
   const remainingDays = daysUntilExpiry(item.expiryDate, today);
@@ -64,11 +68,24 @@ export function CountdownHero({ item, today }: CountdownHeroProps) {
     >
       <StatusBadge label={t(statusKeys[status])} status={status} />
 
-      <CountdownRing fraction={remainingFraction} testID="countdown-ring" tone={tone.foreground}>
-        <Text maxFontSizeMultiplier={1.3} testID="countdown-days" variant="displayLgMobile">
+      <CountdownRing
+        fraction={remainingFraction}
+        size={ringSize}
+        testID="countdown-ring"
+        tone={tone.foreground}
+      >
+        {/*
+          Capped at the same ceiling as the ring around it: past that the ring
+          stops growing, so the number has to stop too or it overflows the arc.
+        */}
+        <Text
+          maxFontSizeMultiplier={MAX_LAYOUT_SCALE}
+          testID="countdown-days"
+          variant="displayLgMobile"
+        >
           {remainingDays < 0 ? String(Math.abs(remainingDays)) : String(remainingDays)}
         </Text>
-        <Text style={{ color: tone.foreground }} variant="labelSm">
+        <Text style={{ color: tone.foreground }} uppercase variant="labelSm">
           {remainingDays < 0 ? t('countdown.daysAgoLabel') : t('countdown.daysLeftLabel')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodySm">

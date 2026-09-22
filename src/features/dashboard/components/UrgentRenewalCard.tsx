@@ -1,11 +1,11 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Card, Icon, StatusBadge, Text, iconForCategory } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
 import { documentStatus } from '@/features/expiry';
 import { useTranslation } from 'react-i18next';
 
-import { useTheme } from '@/theme';
+import { MAX_LAYOUT_SCALE, useFontScale, useStackedLayout, useTheme } from '@/theme';
 
 import { daysLeftLabel, elapsedFraction, elapsedLabel } from '../selectors';
 import { formatDate } from '@/i18n';
@@ -20,12 +20,24 @@ export interface UrgentRenewalCardProps {
 }
 
 /** The export's cards are a fixed 285px so the next one peeks into view. */
-const CARD_WIDTH = 285;
+/**
+ * The export draws these at 285, which is 89% of a 320pt viewport. Taken as a
+ * share of the real width instead, so the card peeks the next one on every
+ * screen size and never exceeds the margins on the smallest.
+ */
+const CARD_WIDTH_FRACTION = 0.78;
+const MAX_CARD_WIDTH = 285;
 
 export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const locale = useLocale();
+  const { width } = useWindowDimensions();
+  const stacked = useStackedLayout();
+  const cardWidth = Math.min(
+    MAX_CARD_WIDTH * Math.min(useFontScale(), MAX_LAYOUT_SCALE),
+    width * CARD_WIDTH_FRACTION,
+  );
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
   const countdown = daysLeftLabel(item.expiryDate, today, t);
@@ -38,11 +50,11 @@ export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardPro
       onPress={() => {
         onPress(item);
       }}
-      style={{ width: CARD_WIDTH }}
+      style={{ width: cardWidth }}
       testID={`urgent-card-${item.id}`}
     >
       <View style={{ gap: theme.spacing.md }}>
-        <View style={[styles.header, { gap: theme.spacing.sm }]}>
+        <View style={[stacked ? styles.headerStack : styles.header, { gap: theme.spacing.sm }]}>
           <View
             style={[
               styles.iconBox,
@@ -53,11 +65,11 @@ export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardPro
           </View>
 
           <View style={styles.titleBlock}>
-            <Text numberOfLines={1} variant="labelLg">
+            <Text numberOfLines={stacked ? undefined : 1} variant="labelLg">
               {item.title}
             </Text>
             {item.issuer === null ? null : (
-              <Text color="onSurfaceVariant" numberOfLines={1} variant="bodySm">
+              <Text color="onSurfaceVariant" numberOfLines={stacked ? undefined : 1} variant="bodySm">
                 {item.issuer}
               </Text>
             )}
@@ -107,6 +119,7 @@ export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardPro
 const styles = StyleSheet.create({
   fill: { height: '100%' },
   header: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  headerStack: { alignItems: 'flex-start', flexDirection: 'column' },
   iconBox: { alignItems: 'center', height: 40, justifyContent: 'center', width: 40 },
   titleBlock: { flex: 1 },
   track: { height: 6, overflow: 'hidden', width: '100%' },

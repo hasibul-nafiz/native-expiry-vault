@@ -364,8 +364,8 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
                   },
                 ]}
               >
-                <Text color="onSurfaceVariant" variant="labelSm">
-                  {note.title.toUpperCase()}
+                <Text color="onSurfaceVariant" uppercase variant="labelSm">
+                  {note.title}
                 </Text>
                 <Text variant="bodyMd">{note.body}</Text>
               </View>

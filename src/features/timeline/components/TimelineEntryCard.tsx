@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Card, Icon, StatusBadge, Text, iconForCategory } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
-import { useTheme } from '@/theme';
+import { useStackedLayout, useTheme } from '@/theme';
 
 import { daysLeftLabel } from '../../dashboard/selectors';
 import { documentStatus } from '../../expiry';
@@ -34,6 +34,7 @@ const statusKeys = {
 export function TimelineEntryCard({ item, today, onPress, testID }: TimelineEntryCardProps) {
   const theme = useTheme();
   const { t } = useTranslation();
+  const stacked = useStackedLayout();
   const status = documentStatus(item.expiryDate, today);
   const countdown = daysLeftLabel(item.expiryDate, today, t);
 
@@ -43,7 +44,7 @@ export function TimelineEntryCard({ item, today, onPress, testID }: TimelineEntr
       onPress={() => onPress(item.id)}
       testID={testID}
     >
-      <View style={[styles.row, { gap: theme.spacing.sm }]}>
+      <View style={[stacked ? styles.stack : styles.row, { gap: theme.spacing.sm }]}>
         <View
           style={[
             styles.glyph,
@@ -55,15 +56,15 @@ export function TimelineEntryCard({ item, today, onPress, testID }: TimelineEntr
         >
           <Icon color="primary" name={iconForCategory(item.category)} size={22} />
         </View>
-        <View style={[styles.body, { gap: theme.spacing.xs }]}>
-          <Text numberOfLines={2} variant="titleMd">
+        <View style={[stacked ? styles.bodyStacked : styles.body, { gap: theme.spacing.xs }]}>
+          <Text numberOfLines={stacked ? undefined : 2} variant="titleMd">
             {item.title}
           </Text>
           <Text color="onSurfaceVariant" variant="bodySm">
             {countdown}
           </Text>
           {item.issuer === null ? null : (
-            <Text color="onSurfaceVariant" numberOfLines={1} variant="bodySm">
+            <Text color="onSurfaceVariant" numberOfLines={stacked ? undefined : 1} variant="bodySm">
               {item.issuer}
             </Text>
           )}
@@ -76,6 +77,8 @@ export function TimelineEntryCard({ item, today, onPress, testID }: TimelineEntr
 
 const styles = StyleSheet.create({
   row: { alignItems: 'flex-start', flexDirection: 'row' },
+  stack: { alignItems: 'flex-start', flexDirection: 'column' },
   glyph: { alignItems: 'center', height: 44, justifyContent: 'center', width: 44 },
   body: { flex: 1 },
+  bodyStacked: { alignSelf: 'stretch' },
 });

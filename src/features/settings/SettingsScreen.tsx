@@ -91,9 +91,11 @@ export function SettingsScreen() {
   const version = Constants.expoConfig?.version ?? '';
 
   return (
-    <Screen scroll testID="settings-screen">
+    <Screen scroll tabBar testID="settings-screen">
       <View style={{ gap: theme.spacing.lg }}>
-        <Text variant="headlineMd">{t('settings.title')}</Text>
+        <Text accessibilityRole="header" variant="headlineMd">
+          {t('settings.title')}
+        </Text>
 
         <Section title={t('settings.sectionPreferences')}>
           <SettingsRow
@@ -195,8 +197,8 @@ export function SettingsScreen() {
               padding: theme.spacing.md,
             }}
           >
-            <Text color="primary" variant="labelSm">
-              {t('settings.offlineTitle').toUpperCase()}
+            <Text color="primary" uppercase variant="labelSm">
+              {t('settings.offlineTitle')}
             </Text>
             <Text color="onSurfaceVariant" variant="bodySm">
               {t('settings.offlineBody')}
@@ -276,8 +278,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
   return (
     <View style={{ gap: theme.spacing.sm }}>
-      <Text accessibilityRole="header" color="onSurfaceVariant" variant="labelSm">
-        {title.toUpperCase()}
+      <Text accessibilityRole="header" color="onSurfaceVariant" uppercase variant="labelSm">
+        {title}
       </Text>
       {children}
     </View>

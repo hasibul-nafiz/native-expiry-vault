@@ -164,8 +164,8 @@ function CandidateRow({ candidate, date, onConfirm }: CandidateRowProps) {
 
   return (
     <Pressable
-      accessibilityHint={`Read from "${candidate.source}"`}
-      accessibilityLabel={`Use ${date} as the expiry date`}
+      accessibilityHint={t('scan.candidateSource', { source: candidate.source })}
+      accessibilityLabel={t('scan.useDateHint', { date })}
       accessibilityRole="button"
       onPress={() => {
         onConfirm(candidate, date);
@@ -231,8 +231,8 @@ function MrzSummary({ result }: { result: ScanResult }) {
 
   return (
     <View style={{ gap: theme.spacing.xs }} testID="scan-mrz">
-      <Text color="onSurfaceVariant" variant="labelSm">
-        {t('scan.alsoRead').toUpperCase()}
+      <Text color="onSurfaceVariant" uppercase variant="labelSm">
+        {t('scan.alsoRead')}
       </Text>
       {rows.map((row) => (
         <View key={row.label} style={[styles.row, { gap: theme.spacing.xs }]}>

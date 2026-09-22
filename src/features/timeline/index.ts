@@ -1,8 +1,8 @@
 export { TimelineScreen } from './TimelineScreen';
 export { monthBand, ACTION_MAX_DAYS, REVIEW_MAX_DAYS, SAFE_WINDOW_MAX_DAYS } from './bands';
 export type { TimelineBand } from './bands';
-export { groupByMonth } from './groupByMonth';
-export type { MonthGroup } from './groupByMonth';
+export { groupByMonth, toSections } from './groupByMonth';
+export type { MonthGroup, MonthSection } from './groupByMonth';
 export {
   countsByRange,
   filterByRange,

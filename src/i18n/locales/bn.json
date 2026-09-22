@@ -14,7 +14,8 @@
     "loading": "লোড হচ্ছে",
     "notSet": "নির্ধারিত নয়",
     "dismiss": "বন্ধ করুন",
-    "listSeparator": " · "
+    "listSeparator": " · ",
+    "requiredField": "{{label}}, আবশ্যক"
   },
   "status": {
     "safe": "নিরাপদ",
@@ -197,7 +198,15 @@
     "remindersTitle": "অনুস্মারক",
     "remindersNote": "কেবল স্থানীয় বিজ্ঞপ্তি। কিছুই এই ডিভাইস ছাড়ে না।",
     "escalationBody": "শেষ {{count}} দিনে প্রতিদিন সতর্কতা।",
-    "stepProgress": "ধাপ {{total}}-এর {{current}}: {{name}}"
+    "stepProgress": "ধাপ {{total}}-এর {{current}}: {{name}}",
+    "goToStep": "ধাপ {{step}}-এ যান, {{name}}",
+    "stepNameCategory": "শ্রেণি",
+    "stepNameCapture": "সংগ্রহ",
+    "stepNameVerify": "যাচাই",
+    "stepNameReminders": "অনুস্মারক",
+    "removeAttachment": "{{name}} সরান",
+    "dateChosen": "{{label}}, {{value}}",
+    "dateNotChosen": "{{label}}, কোনো তারিখ বাছাই করা হয়নি"
   },
   "editItem": {
     "title": "নথি সম্পাদনা",
@@ -255,7 +264,10 @@
     "percent": "{{percent}}%",
     "documentNumberLabel": "নথি নম্বর",
     "reminderScheduleLabel": "অনুস্মারকের সূচি",
-    "offsetDays": "{{count}} দিন"
+    "offsetDays": "{{count}} দিন",
+    "viewAttachment": "{{name}} দেখুন",
+    "revealNumber": "নথি নম্বর দেখান",
+    "hideNumber": "নথি নম্বর আড়াল করুন"
   },
   "reminders": {
     "title": "অনুস্মারক",
@@ -320,7 +332,10 @@
     "rationaleTitle": "একটি নথি স্ক্যান করুন",
     "rationaleBody": "ExpiryVault কেবল সামনের নথি থেকে তারিখ পড়তে ক্যামেরা ব্যবহার করে। ছবিটি এই ডিভাইসেই প্রক্রিয়া হয়, কোথাও পাঠানো হয় না, এবং আপনি নিজে যুক্ত না করলে রাখা হয় না।",
     "deniedBody": "ExpiryVault-এর ক্যামেরা অ্যাক্সেস বন্ধ আছে। সেটিংস থেকে চালু করুন, অথবা অন্যভাবে নথিটি যোগ করুন।",
-    "retryBody": "নথিটি সমতলে ও সমান আলোয় রেখে আবার চেষ্টা করুন, অথবা তারিখটি নিজে টাইপ করুন।"
+    "retryBody": "নথিটি সমতলে ও সমান আলোয় রেখে আবার চেষ্টা করুন, অথবা তারিখটি নিজে টাইপ করুন।",
+    "useDateHint": "মেয়াদ শেষের তারিখ হিসেবে {{date}} ব্যবহার করুন",
+    "captureMode": "{{label}} ধারণ",
+    "candidateSource": "“{{source}}” থেকে পড়া"
   },
   "lock": {
     "welcome": "স্বাগতম",
@@ -371,7 +386,8 @@
     "manageBody": "আপনি ভল্ট খুললে এবং এক মিনিট পটভূমিতে থাকার পরেও এই পিন চাওয়া হবে।",
     "createBody": "কেবল এই পিন ও আপনার ডিভাইসের বায়োমেট্রিক ভল্ট খুলতে পারে। এটি পুনরুদ্ধারের কোনো উপায় নেই।",
     "changePin": "পিন পরিবর্তন করুন",
-    "removePinHint": "পিন সরিয়ে দেয়। ভল্ট আর জিজ্ঞাসা ছাড়াই খুলবে।"
+    "removePinHint": "পিন সরিয়ে দেয়। ভল্ট আর জিজ্ঞাসা ছাড়াই খুলবে।",
+    "pinProgress": "{{label}}, {{total}}টির মধ্যে {{filled}}টি অঙ্ক দেওয়া হয়েছে"
   },
   "settings": {
     "title": "সেটিংস",
@@ -494,7 +510,8 @@
   },
   "errors": {
     "genericTitle": "কিছু একটা ভুল হয়েছে",
-    "genericBody": "আপনার তথ্য পরিবর্তন করা হয়নি।"
+    "genericBody": "আপনার তথ্য পরিবর্তন করা হয়নি।",
+    "boundaryAction": "আবার চেষ্টা করুন"
   },
   "tabs": {
     "vault": "ভল্ট",

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TextInput, View, type TextInputProps } from 'react-native';
 
 import { minTouchTarget, useTheme } from '@/theme';
@@ -24,6 +25,7 @@ export function Input({
   ...rest
 }: InputProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
   const invalid = error !== undefined;
 
@@ -55,7 +57,7 @@ export function Input({
       </Text>
 
       <TextInput
-        accessibilityLabel={required ? `${label}, required` : label}
+        accessibilityLabel={required ? t('common.requiredField', { label }) : label}
         accessibilityState={{ disabled: rest.editable === false }}
         onBlur={handleBlur}
         onFocus={handleFocus}

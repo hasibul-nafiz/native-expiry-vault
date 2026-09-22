@@ -75,7 +75,9 @@ export function LockScreen(props: LockScreenProps) {
           >
             <Icon color="onPrimaryContainer" name="lock" size={28} />
           </View>
-          <Text variant="headlineMd">{t('lock.welcome')}</Text>
+          <Text accessibilityRole="header" variant="headlineMd">
+          {t('lock.welcome')}
+        </Text>
           <Text color="onSurfaceVariant" style={styles.centred} variant="bodySm">
             {t('lock.subtitle')}
           </Text>

@@ -203,7 +203,7 @@ export function EditItemScreen({ itemId }: EditItemScreenProps) {
           testID="edit-cancel"
           variant="ghost"
         />
-        <Text numberOfLines={1} style={styles.title} variant="titleLg">
+        <Text accessibilityRole="header" numberOfLines={1} style={styles.title} variant="titleLg">
           {t('editItem.header')}
         </Text>
         <Button

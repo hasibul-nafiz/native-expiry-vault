@@ -138,7 +138,7 @@ export function RemindersStep({
           </Text>
         </View>
         <Switch
-          accessibilityLabel="{t('addItem.escalationLabel')}"
+          accessibilityLabel={t('addItem.escalationLabel')}
           onValueChange={onEscalationChange}
           testID="escalation-switch"
           thumbColor={theme.colors.surfaceContainerLowest}

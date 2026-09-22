@@ -1,7 +1,7 @@
 import { StyleSheet, Switch, View } from 'react-native';
 
 import { Card, Icon, Text, type IconName } from '@/components';
-import { minTouchTarget, useTheme } from '@/theme';
+import { minTouchTarget, useStackedLayout, useTheme } from '@/theme';
 
 /**
  * One settings row: glyph, title, optional subtitle, and either a trailing
@@ -36,9 +36,15 @@ export function SettingsRow({
   testID,
 }: SettingsRowProps) {
   const theme = useTheme();
+  const stacked = useStackedLayout();
 
   const body = (
-    <View style={[styles.row, { gap: theme.spacing.sm, minHeight: minTouchTarget }]}>
+    <View
+      style={[
+        stacked ? styles.stack : styles.row,
+        { gap: theme.spacing.sm, minHeight: minTouchTarget },
+      ]}
+    >
       <View
         style={[
           styles.glyph,
@@ -47,7 +53,7 @@ export function SettingsRow({
       >
         <Icon color="primary" name={icon} size={20} />
       </View>
-      <View style={styles.grow}>
+      <View style={stacked ? styles.growStacked : styles.grow}>
         <Text variant="titleMd">{title}</Text>
         {subtitle === undefined ? null : (
           <Text color="onSurfaceVariant" variant="bodySm">
@@ -94,6 +100,8 @@ export function SettingsRow({
 
 const styles = StyleSheet.create({
   row: { alignItems: 'center', flexDirection: 'row' },
+  stack: { alignItems: 'flex-start', flexDirection: 'column' },
   glyph: { alignItems: 'center', height: 40, justifyContent: 'center', width: 40 },
   grow: { flex: 1 },
+  growStacked: { alignSelf: 'stretch' },
 });

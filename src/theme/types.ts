@@ -11,6 +11,13 @@ export type ColorSchemeName = 'light' | 'dark';
 
 export interface Theme {
   scheme: ColorSchemeName;
+  /**
+   * Mirrors the OS "Reduce Motion" switch.
+   *
+   * On the theme rather than read per component, so every animated surface
+   * answers to one source and none can be forgotten.
+   */
+  reduceMotion: boolean;
   colors: ThemeColors;
   status: StatusColors;
   /** The timeline's five month bands, three of them aliases of `status`. */
@@ -19,7 +26,11 @@ export interface Theme {
   spacing: typeof spacing;
   radius: typeof radius;
   elevation: typeof elevation;
-  interaction: typeof interaction;
+  /**
+   * Widened from the token's literal types: `pressedScale` is overridden to 1
+   * under Reduce Motion, which `as const` would otherwise forbid.
+   */
+  interaction: Record<keyof typeof interaction, number>;
 }
 
 export type { PaletteColor };

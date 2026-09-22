@@ -258,8 +258,8 @@ describe('accessibility', () => {
   it('labels every key by name', async () => {
     await mount(fakeLockStorage(PIN));
 
-    expect(screen.getByLabelText('Seven')).toBeTruthy();
-    expect(screen.getByLabelText('Zero')).toBeTruthy();
+    expect(screen.getByLabelText('Digit 7')).toBeTruthy();
+    expect(screen.getByLabelText('Digit 0')).toBeTruthy();
     expect(screen.getByLabelText('Delete last digit')).toBeTruthy();
   });
 

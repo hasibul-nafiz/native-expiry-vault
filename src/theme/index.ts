@@ -1,4 +1,5 @@
 export { ThemeProvider, useTheme } from './ThemeProvider';
+export { useReducedMotion } from './useReducedMotion';
 export { useAppFonts } from './useAppFonts';
 export {
   contrastRatio,
@@ -21,5 +22,19 @@ export {
 export type { TimelineBand, TimelineExtraBand, TimelineExtraPalette } from './tokens/timeline';
 export { typography, fontFamilies } from './tokens/typography';
 export type { TypographyVariant } from './tokens/typography';
-export { spacing, radius, elevation, interaction, minTouchTarget } from './tokens/layout';
+export {
+  spacing,
+  radius,
+  elevation,
+  interaction,
+  minTouchTarget,
+  tabBarHeight,
+} from './tokens/layout';
+export {
+  useFontScale,
+  useScaledSize,
+  useStackedLayout,
+  MAX_LAYOUT_SCALE,
+  STACK_THRESHOLD,
+} from './useFontScale';
 export type { Theme, ThemeColors, StatusColors, ColorSchemeName, PaletteColor } from './types';

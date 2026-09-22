@@ -44,8 +44,8 @@ export function VaultHeroCard({ total, nextRenewal, today, onViewNext }: VaultHe
     >
       <View style={styles.headerRow}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text color="onPrimary" variant="labelSm">
-            {t('dashboard.heroEyebrow').toUpperCase()}
+          <Text color="onPrimary" uppercase variant="labelSm">
+            {t('dashboard.heroEyebrow')}
           </Text>
           <View style={[styles.countRow, { gap: theme.spacing.sm }]}>
             <Text color="onPrimary" testID="vault-hero-total" variant="displayLgMobile">

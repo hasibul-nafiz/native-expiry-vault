@@ -58,8 +58,8 @@ export function HealthCard({ score, band, totalItems, soonCount, missingAlerts }
   const { t } = useTranslation();
 
   const heading = (
-    <Text style={{ color: theme.colors.onPrimary }} variant="labelSm">
-      {t('vaultHealth.healthTitle').toUpperCase()}
+    <Text style={{ color: theme.colors.onPrimary }} uppercase variant="labelSm">
+      {t('vaultHealth.healthTitle')}
     </Text>
   );
 

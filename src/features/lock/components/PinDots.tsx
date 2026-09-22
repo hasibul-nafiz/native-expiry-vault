@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/theme';
@@ -24,11 +25,12 @@ const DOT_SIZE = 14;
  */
 export function PinDots({ filled, invalid = false, label }: PinDotsProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const fillColour = invalid ? theme.colors.error : theme.colors.secondary;
 
   return (
     <View
-      accessibilityLabel={`${label}, ${filled} of ${PIN_LENGTH} digits entered`}
+      accessibilityLabel={t('lock.pinProgress', { label, filled, total: PIN_LENGTH })}
       accessible
       style={[styles.container, { gap: theme.spacing.md }]}
       testID="pin-dots"

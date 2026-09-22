@@ -20,3 +20,4 @@ export { Icon, iconForCategory } from './Icon';
 export type { IconProps, IconName } from './Icon';
 export { CountdownRing, dashOffsetFor } from './CountdownRing';
 export type { CountdownRingProps } from './CountdownRing';
+export { AppErrorBoundary } from './AppErrorBoundary';

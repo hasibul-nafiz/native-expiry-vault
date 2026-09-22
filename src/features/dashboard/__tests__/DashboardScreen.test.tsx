@@ -235,3 +235,55 @@ describe('a populated dashboard', () => {
     expect(await screen.findByTestId('reminders-sheet')).toBeOnTheScreen();
   });
 });
+
+/**
+ * F13 moved the vault records off a `ScrollView` full of `.map()` and onto a
+ * virtualized list. These pin the behaviour that swap could have broken: the
+ * page chrome still scrolls with the rows, and the filtered and empty paths
+ * still render what they did before.
+ */
+describe('the records list', () => {
+  it('renders the page chrome and the rows in one scroller', async () => {
+    await seed([
+      { title: 'Passport', category: 'passport', expiryDate: at(400) },
+      { title: 'Visa', category: 'visa', expiryDate: at(20) },
+    ]);
+
+    wrap(<DashboardScreen />, db);
+
+    const list = await screen.findByTestId('dashboard-scroll');
+
+    expect(list).toBeOnTheScreen();
+    // Header content, which now rides along as the list header.
+    expect(screen.getByTestId('vault-hero')).toBeOnTheScreen();
+    expect(screen.getByTestId('dashboard-search')).toBeOnTheScreen();
+    // And the rows themselves. Matched by testID, since an item near its
+    // expiry also appears by name in the urgent scroller above.
+    expect(screen.getAllByTestId(/^record-row-/)).toHaveLength(2);
+  });
+
+  it('virtualizes rather than mounting every row', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: at(400) }]);
+
+    wrap(<DashboardScreen />, db);
+    const list = await screen.findByTestId('dashboard-scroll');
+
+    // A FlatList exposes the windowing props a plain ScrollView does not.
+    expect(list.props.getItem).toBeDefined();
+    expect(list.props.getItemCount).toBeDefined();
+  });
+
+  it('keeps the no-matches state when a filter excludes everything', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: at(400) }]);
+
+    wrap(<DashboardScreen />, db);
+
+    fireEvent.changeText(await screen.findByTestId('dashboard-search'), 'no such document');
+
+    await waitFor(() => {
+      expect(screen.queryAllByTestId(/^record-row-/)).toHaveLength(0);
+    });
+
+    expect(screen.getByText('No matches')).toBeOnTheScreen();
+  });
+});
