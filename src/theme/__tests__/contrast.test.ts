@@ -2,6 +2,12 @@ import { contrastRatio, relativeLuminance, WCAG_AA_BODY, WCAG_AA_NON_TEXT } from
 import { darkPalette } from '../tokens/palette.dark';
 import { lightPalette } from '../tokens/palette.light';
 import { documentStatuses, statusDark, statusLight } from '../tokens/status';
+import {
+  buildBandPalette,
+  timelineBands,
+  timelineExtraDark,
+  timelineExtraLight,
+} from '../tokens/timeline';
 import type { ThemeColors } from '../types';
 
 describe('contrast maths', () => {
@@ -83,6 +89,52 @@ describe.each([
   it.each(documentStatuses)('%s foreground is readable on its container', (name) => {
     const { foreground, container } = status[name];
     expect(contrastRatio(foreground, container)).toBeGreaterThanOrEqual(WCAG_AA_BODY);
+  });
+});
+
+describe.each([
+  ['light', timelineExtraLight],
+  ['dark', timelineExtraDark],
+])('%s timeline band tokens meet WCAG AA', (_scheme, extra) => {
+  it.each(Object.keys(extra) as (keyof typeof extra)[])(
+    '%s foreground is readable on its container',
+    (name) => {
+      const { foreground, container } = extra[name];
+      expect(contrastRatio(foreground, container)).toBeGreaterThanOrEqual(WCAG_AA_BODY);
+    },
+  );
+});
+
+describe('timeline band palette', () => {
+  it.each([
+    ['light', statusLight, timelineExtraLight],
+    ['dark', statusDark, timelineExtraDark],
+  ])('%s resolves all five bands to readable pairs', (_scheme, status, extra) => {
+    const bands = buildBandPalette(status, extra);
+
+    expect(Object.keys(bands).sort()).toEqual([...timelineBands].sort());
+
+    for (const band of timelineBands) {
+      const { foreground, container } = bands[band];
+      expect(contrastRatio(foreground, container)).toBeGreaterThanOrEqual(WCAG_AA_BODY);
+    }
+  });
+
+  /**
+   * Three bands are aliases, not copies. If someone restates a hex here instead
+   * of referencing the status token, a month header and a document badge can
+   * start describing the same urgency in different colours.
+   */
+  it('reuses the status tones rather than duplicating their values', () => {
+    const bands = buildBandPalette(statusLight, timelineExtraLight);
+
+    expect(bands.critical).toBe(statusLight.expired);
+    expect(bands.action).toBe(statusLight.soon);
+    expect(bands.safeWindow).toBe(statusLight.safe);
+  });
+
+  it('defines the same extra-band shape in both schemes', () => {
+    expect(Object.keys(timelineExtraDark).sort()).toEqual(Object.keys(timelineExtraLight).sort());
   });
 });
 

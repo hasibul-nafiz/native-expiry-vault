@@ -11,7 +11,14 @@ export {
 export { lightPalette } from './tokens/palette.light';
 export { darkPalette } from './tokens/palette.dark';
 export { statusLight, statusDark, documentStatuses } from './tokens/status';
-export type { DocumentStatus } from './tokens/status';
+export type { DocumentStatus, StatusTone } from './tokens/status';
+export {
+  buildBandPalette,
+  timelineBands,
+  timelineExtraLight,
+  timelineExtraDark,
+} from './tokens/timeline';
+export type { TimelineBand, TimelineExtraBand, TimelineExtraPalette } from './tokens/timeline';
 export { typography, fontFamilies } from './tokens/typography';
 export type { TypographyVariant } from './tokens/typography';
 export { spacing, radius, elevation, interaction, minTouchTarget } from './tokens/layout';

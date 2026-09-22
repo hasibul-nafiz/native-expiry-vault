@@ -1,10 +1,3 @@
-import { Screen, Text } from '@/components';
+import { TimelineScreen } from '@/features/timeline';
 
-/** Placeholder. F10 builds the expiry timeline here. */
-export default function TimelineScreen() {
-  return (
-    <Screen>
-      <Text variant="headlineMd">Timeline</Text>
-    </Screen>
-  );
-}
+export default TimelineScreen;

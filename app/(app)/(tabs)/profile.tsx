@@ -1,10 +1,3 @@
-import { Screen, Text } from '@/components';
+import { VaultHealthScreen } from '@/features/vault-health';
 
-/** Placeholder. F10 builds the profile and vault-health screen here. */
-export default function ProfileScreen() {
-  return (
-    <Screen>
-      <Text variant="headlineMd">Profile</Text>
-    </Screen>
-  );
-}
+export default VaultHealthScreen;
