@@ -192,8 +192,8 @@ function GrantedBody({ upcoming, scheduledThrough, syncing }: GrantedBodyProps) 
 
   return (
     <View style={{ gap: theme.spacing.sm }} testID="reminders-upcoming">
-      <Text color="onSurfaceVariant" variant="labelSm">
-        {t('reminders.nextReminders').toUpperCase()}
+      <Text color="onSurfaceVariant" uppercase variant="labelSm">
+        {t('reminders.nextReminders')}
       </Text>
 
       {preview.map((entry) => (

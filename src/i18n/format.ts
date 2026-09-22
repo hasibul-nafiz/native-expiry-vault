@@ -69,11 +69,17 @@ export function formatDateLong(date: IsoDate, locale: SupportedLocale): string {
   );
 }
 
-/** "MAY 2031" for the timeline's month headers, replacing F10's English array. */
+/**
+ * "May 2031" for the timeline's month headers, replacing F10's English array.
+ *
+ * Returned in its natural case. The header renders it in capitals with
+ * `textTransform`, because this string is also its accessibility label and an
+ * uppercased one is read out letter by letter.
+ */
 export function formatMonthHeading(year: number, month: number, locale: SupportedLocale): string {
   const date = new Date(Date.UTC(year, month - 1, 15, 12));
 
-  return dateFormatter(locale, { month: 'short', year: 'numeric' }).format(date).toUpperCase();
+  return dateFormatter(locale, { month: 'short', year: 'numeric' }).format(date);
 }
 
 /** "09:00" — the reminder delivery time. Hour-only, so minutes are always zero. */

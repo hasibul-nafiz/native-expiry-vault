@@ -1,9 +1,9 @@
 # ExpiryVault Progress
 
 ## Current
-Feature: none started (F12 complete)
-Branch: feat/foundation (F0-F12 all landed here, not on main)
-Next: F13 Accessibility + platform polish
+Feature: none started (F13 complete)
+Branch: feat/foundation (F0-F13 all landed here, not on main)
+Next: F14 Store readiness (assets, permissions strings, privacy policy, EAS submit)
 
 ## Features
 Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
@@ -21,7 +21,7 @@ Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
 - [x] F10 Timeline + vault health screens
 - [x] F11 Settings, i18n (EN + BN)
 - [x] F12 Backup/export/restore (password-encrypted .evault, versioned, atomic)
-- [ ] F13 Accessibility + platform polish
+- [x] F13 Accessibility + platform polish
 - [ ] F14 Store readiness (assets, 
 permissions strings, privacy policy, EAS submit)
 
@@ -243,7 +243,31 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - The palette is not strict M3 (light `primary-container` is a brighter primary with white text, not a tone-90 container), so the derivation preserves the relationships actually present rather than imposing textbook tones.
 - Every derived pair is asserted against WCAG AA in `src/theme/__tests__/contrast.test.ts`, so a bad value fails CI rather than shipping.
 
+- 2026-09-22: F13 opened with an audit of all 20 screens; contrast, touch targets, roles and state were already sound, so the work concentrated on the eleven gaps the audit found rather than a blanket sweep.
+- 2026-09-22: `Text` gained an `uppercase` prop and every `.toUpperCase()` in the UI was removed — uppercasing the string is what VoiceOver reads (it spells short all-caps tokens out) and is a no-op in Bengali, so the two locales diverged silently.
+- 2026-09-22: `countdown.daysLeftLabel`, `daysAgoLabel` and `addItem.attachedCount` had the capitals baked into the catalogue; changed to natural case for the same reason.
+- 2026-09-22: `formatMonthHeading` no longer uppercases — its output is also the month header's accessibility label, so the casing moved to the view.
+- 2026-09-22: Nine accessibility labels were hardcoded English and one (`RemindersStep`) was quoted by mistake, announcing `{t('addItem.escalationLabel')}` verbatim; all now come from the catalogue.
+- 2026-09-22: `stepNames` in add-item's schema was hardcoded English and rendered untranslated in the Bengali wizard; it is now a map of translation keys.
+- 2026-09-22: Accessibility strings are guarded by a source scan in `src/i18n/__tests__/accessibilityStrings.test.tsx`, not just by review — the literal is the failure that keeps coming back.
+- 2026-09-22: Font-scale response is one hook (`src/theme/useFontScale.ts`) with one threshold, so five components cannot each guess a different one; above 1.3 the four multi-column rows stack instead of truncating.
+- 2026-09-22: `MAX_LAYOUT_SCALE` (2x) caps geometry that scales with its text — the countdown ring grows with the number inside it rather than capping the number at 1.3, which was hiding the one figure a low-vision user most needs.
+- 2026-09-22: `AppErrorBoundary` supplies its own `SafeAreaProvider`/`ThemeProvider` — expo-router renders a boundary *instead of* the layout exporting it, so at the root there is no theme above it.
+- 2026-09-22: The error boundary never renders the error message, for the same reason nothing is logged: it can name a document.
+- 2026-09-22: Reduce Motion moved onto the theme (`theme.reduceMotion`) and neutralises `interaction.pressedScale`; one flag reaches every button, card, chip and tile instead of each opting in. `Theme['interaction']` widened from the `as const` literals to allow the override.
+- 2026-09-22: `Screen` gained a `tabBar` prop that drops the bottom safe-area edge. The library's insets are window-level, so a tab screen claiming `bottom` padded for the home indicator twice — once under the native tab bar, once above it.
+- 2026-09-22: The dashboard's hardcoded `TAB_BAR_ALLOWANCE = 64` became `tabBarHeight` in the layout tokens (49pt iOS / 80dp Android); `expo-router/unstable-native-tabs` exposes no height hook, so a constant is unavoidable — but only one.
+- 2026-09-22: `KeyboardAvoidingView` behaviour is `undefined` on Android rather than `'height'`; Android already resizes the window under `adjustResize`, so it was adjusting twice.
+- 2026-09-22: `StatusBar` follows the resolved theme instead of `style="auto"`, which followed the *system* scheme and was wrong whenever the in-app theme preference disagreed with it. `expo-system-ui` sets the window background to match, so edge-to-edge Android no longer flashes white in dark mode.
+- 2026-09-22: The vault records list became a `FlatList` with the page chrome as `ListHeaderComponent`; the bordered container is reproduced per cell, since a virtualized list has cells and no wrapper. The status filter is memoized — it re-ran over every row on every render.
+- 2026-09-22: Row components were not wrapped in `React.memo`: `reactCompiler` is enabled and already memoizes the JSX, so it would be redundant.
+
 ## Known issues / tech debt
+- The timeline feed is still a `ScrollView` of `.map()` calls. Converting it to a `SectionList` would break the continuous rail behind the months, which is drawn as one absolutely-positioned line across the group gaps; every cell and separator would have to carry the rail instead. Deferred as a deliberate scope call — the dashboard was the unbounded list, the timeline is bounded by the same vault.
+- `tabBarHeight` (49pt / 80dp) is a documented guess, not a measurement — `expo-router/unstable-native-tabs` has no height hook. Verify on a device, and re-check after an OS or SDK upgrade.
+- The Android edge-to-edge work (window background, status-bar style, the dropped bottom inset on tab screens, `KeyboardAvoidingView` behaviour) is reasoned from the platform's behaviour, not confirmed on hardware. It is the part of F13 most likely to need a second pass.
+- The navigation-only Android navigation-bar icon contrast is untested; nothing in the app sets it, and edge-to-edge leaves it to the system theme.
+- `__tests__/navigation.test.tsx` intermittently exceeds the 5s per-test timeout under parallel workers — it mounts the whole router and takes ~30s. Passes in isolation and under `--runInBand`; a different test fails each run. Pre-existing, not a regression; it wants a per-suite timeout.
 - Six unused template dependencies left from F0: `@expo/ui`, `expo-glass-effect`, `expo-symbols`, `expo-image`, `expo-device`, `expo-web-browser`.
 - DESIGN.md's two-layer shadows with negative spread cannot be expressed in RN (iOS has one shadow, no spread; Android only `elevation`) — `src/theme/tokens/layout.ts` holds a per-platform approximation.
 - `app/dev-gallery.tsx` still occupies a route in production builds (expo-router registers every file under `app/`); it renders null there and is never linked outside `__DEV__`.
@@ -444,3 +468,4 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 ## Device test log
 (Feature, iOS version/device, Android version/device, result)
 -
+- F13, not yet run on either platform. Needs, on both: VoiceOver/TalkBack sweep of every screen for label, role and focus order; the largest text size on dashboard, timeline, item detail and settings; Reduce Motion on; the keyboard on add/edit; and on Android specifically the bottom inset on all five tab screens, the FAB's clearance over the tab bar, and the navigation-bar treatment in both schemes.

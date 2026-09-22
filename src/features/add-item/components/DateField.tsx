@@ -65,7 +65,11 @@ export function DateField({
 
       <Pressable
         accessibilityHint={t('addItem.datePickerHint')}
-        accessibilityLabel={value === undefined ? `${label}, no date chosen` : `${label}, ${value}`}
+        accessibilityLabel={
+          value === undefined
+            ? t('addItem.dateNotChosen', { label })
+            : t('addItem.dateChosen', { label, value })
+        }
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
         onPress={() => {

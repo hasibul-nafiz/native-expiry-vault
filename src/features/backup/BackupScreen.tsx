@@ -41,7 +41,9 @@ export function BackupScreen() {
     <Screen scroll testID="backup-screen">
       <View style={{ gap: theme.spacing.lg }}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text variant="headlineMd">{t('backup.title')}</Text>
+          <Text accessibilityRole="header" variant="headlineMd">
+          {t('backup.title')}
+        </Text>
           <Text color="onSurfaceVariant" variant="bodyMd">
             {t('backup.intro')}
           </Text>

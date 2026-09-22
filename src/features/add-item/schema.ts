@@ -129,10 +129,14 @@ export const stepFields = {
 export type StepNumber = keyof typeof stepFields;
 export const stepNumbers: readonly StepNumber[] = [1, 2, 3, 4];
 
-/** Verbatim from the export's `stepNames` array. */
-export const stepNames: Record<StepNumber, string> = {
-  1: 'Category',
-  2: 'Capture',
-  3: 'Verify',
-  4: 'Reminders',
+/**
+ * The export's `stepNames` array, as translation keys rather than copy — the
+ * wizard's step names are user-visible text and were rendering as English in
+ * the Bengali UI.
+ */
+export const stepNameKeys: Record<StepNumber, string> = {
+  1: 'addItem.stepNameCategory',
+  2: 'addItem.stepNameCapture',
+  3: 'addItem.stepNameVerify',
+  4: 'addItem.stepNameReminders',
 };

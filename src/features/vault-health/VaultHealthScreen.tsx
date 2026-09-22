@@ -46,9 +46,11 @@ export function VaultHealthScreen() {
   const databaseFailed = databaseState.status === 'error';
 
   return (
-    <Screen scroll testID="vault-health-screen">
+    <Screen scroll tabBar testID="vault-health-screen">
       <View style={{ gap: theme.spacing.md }}>
-        <Text variant="headlineMd">{t('vaultHealth.title')}</Text>
+        <Text accessibilityRole="header" variant="headlineMd">
+          {t('vaultHealth.title')}
+        </Text>
 
         {databaseFailed ? (
           <VaultHealthError

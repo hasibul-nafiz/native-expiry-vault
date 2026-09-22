@@ -82,8 +82,8 @@ describe('the feed', () => {
 
     expect(await screen.findByTestId('timeline-month-2027-03')).toBeTruthy();
     expect(screen.getByTestId('timeline-month-2027-07')).toBeTruthy();
-    expect(screen.getByText('MAR 2027')).toBeTruthy();
-    expect(screen.getByText('JUL 2027')).toBeTruthy();
+    expect(screen.getByText('Mar 2027')).toBeTruthy();
+    expect(screen.getByText('Jul 2027')).toBeTruthy();
   });
 
   it('renders every document as its own card', async () => {

@@ -58,7 +58,7 @@ export function AttachmentsSection({ attachments }: AttachmentsSectionProps) {
           {attachments.map((attachment) => (
             <Pressable
               accessibilityHint={t('itemDetail.attachmentHint')}
-              accessibilityLabel={`View ${attachment.fileName}`}
+              accessibilityLabel={t('itemDetail.viewAttachment', { name: attachment.fileName })}
               accessibilityRole="button"
               key={attachment.id}
               onPress={() => {

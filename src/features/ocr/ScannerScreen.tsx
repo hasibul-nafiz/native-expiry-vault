@@ -435,10 +435,11 @@ interface ModeChipProps {
 
 function ModeChip({ label, value, active, onPress }: ModeChipProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Pressable
-      accessibilityLabel={`${label} capture`}
+      accessibilityLabel={t('scan.captureMode', { label })}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       onPress={() => {

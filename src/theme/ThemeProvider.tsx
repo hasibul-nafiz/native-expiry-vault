@@ -9,16 +9,18 @@ import { statusDark, statusLight } from './tokens/status';
 import { buildBandPalette, timelineExtraDark, timelineExtraLight } from './tokens/timeline';
 import { elevation, interaction, radius, spacing } from './tokens/layout';
 import { typography } from './tokens/typography';
+import { useReducedMotion } from './useReducedMotion';
 import type { ColorSchemeName, Theme } from './types';
 
 const ThemeContext = createContext<Theme | null>(null);
 
-function buildTheme(scheme: ColorSchemeName): Theme {
+function buildTheme(scheme: ColorSchemeName, reduceMotion: boolean): Theme {
   const isDark = scheme === 'dark';
   const status = isDark ? statusDark : statusLight;
 
   return {
     scheme,
+    reduceMotion,
     colors: isDark ? darkPalette : lightPalette,
     status,
     bands: buildBandPalette(status, isDark ? timelineExtraDark : timelineExtraLight),
@@ -26,7 +28,12 @@ function buildTheme(scheme: ColorSchemeName): Theme {
     spacing,
     radius,
     elevation,
-    interaction,
+    /**
+     * The press animation is the app's one universal motion, on every button,
+     * card, chip and tile. Neutralising the scale here is what makes "Reduce
+     * Motion" reach all of them without touching a single component.
+     */
+    interaction: reduceMotion ? { ...interaction, pressedScale: 1 } : interaction,
   };
 }
 
@@ -38,6 +45,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children, scheme }: ThemeProviderProps) {
   const systemScheme = useColorScheme();
+  const reduceMotion = useReducedMotion();
   const { theme: preference } = usePreferences();
 
   /**
@@ -49,7 +57,7 @@ export function ThemeProvider({ children, scheme }: ThemeProviderProps) {
   const resolved: ColorSchemeName =
     preference === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : preference;
   const active: ColorSchemeName = scheme ?? resolved;
-  const theme = useMemo(() => buildTheme(active), [active]);
+  const theme = useMemo(() => buildTheme(active, reduceMotion), [active, reduceMotion]);
 
   return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
 }

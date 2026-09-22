@@ -20,19 +20,6 @@ const KEY_HEIGHT = 56;
 
 const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
 
-const DIGIT_NAMES: Record<string, string> = {
-  '0': 'Zero',
-  '1': 'One',
-  '2': 'Two',
-  '3': 'Three',
-  '4': 'Four',
-  '5': 'Five',
-  '6': 'Six',
-  '7': 'Seven',
-  '8': 'Eight',
-  '9': 'Nine',
-};
-
 export interface KeypadAction {
   icon: IconName;
   label: string;
@@ -73,7 +60,7 @@ export function Keypad({ onDigit, onBackspace, action, disabled = false }: Keypa
     <View style={[styles.grid, { gap: theme.spacing.md }]} testID="keypad">
       {DIGITS.map((digit) => (
         <Pressable
-          accessibilityLabel={DIGIT_NAMES[digit]}
+          accessibilityLabel={t('lock.digitAccessibility', { digit })}
           accessibilityRole="button"
           accessibilityState={{ disabled }}
           android_ripple={disabled ? undefined : { color: theme.colors.surfaceContainerHighest }}
@@ -109,7 +96,7 @@ export function Keypad({ onDigit, onBackspace, action, disabled = false }: Keypa
       )}
 
       <Pressable
-        accessibilityLabel={DIGIT_NAMES['0']}
+        accessibilityLabel={t('lock.digitAccessibility', { digit: ZERO })}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
         android_ripple={disabled ? undefined : { color: theme.colors.surfaceContainerHighest }}

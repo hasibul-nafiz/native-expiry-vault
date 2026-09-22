@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Icon, IconButton, Text } from '@/components';
 import type { IsoDate, Item, ReminderRule } from '@/db/models';
 import { compareDates, daysUntilExpiry } from '@/features/expiry';
-import { useTheme } from '@/theme';
+import { useStackedLayout, useTheme } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@/i18n';
 import { useLocale } from '@/i18n/useLocale';
@@ -72,15 +72,15 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
           ]}
         >
           <View style={styles.numberText}>
-            <Text color="onSurfaceVariant" variant="labelSm">
-              {t('itemDetail.documentNumberLabel').toUpperCase()}
+            <Text color="onSurfaceVariant" uppercase variant="labelSm">
+              {t('itemDetail.documentNumberLabel')}
             </Text>
             <Text testID="document-number" variant="labelLg">
               {revealed ? item.documentNumber : maskNumber(item.documentNumber)}
             </Text>
           </View>
           <IconButton
-            accessibilityLabel={revealed ? 'Hide document number' : 'Show document number'}
+            accessibilityLabel={t(revealed ? 'itemDetail.hideNumber' : 'itemDetail.revealNumber')}
             icon={<Icon color="onSurfaceVariant" name={revealed ? 'clear' : 'search'} size={18} />}
             onPress={() => {
               setRevealed((previous) => !previous);
@@ -92,8 +92,8 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
 
       {reminders.length === 0 ? null : (
         <View style={{ gap: theme.spacing.xs }}>
-          <Text color="onSurfaceVariant" variant="labelSm">
-            {t('itemDetail.reminderScheduleLabel').toUpperCase()}
+          <Text color="onSurfaceVariant" uppercase variant="labelSm">
+            {t('itemDetail.reminderScheduleLabel')}
           </Text>
           <View style={[styles.reminders, { gap: theme.spacing.xs }]}>
             {reminders.map((rule) => {
@@ -146,6 +146,9 @@ interface FactProps {
 
 function Fact({ label, value, secondary, tone }: FactProps) {
   const theme = useTheme();
+  // A date or a country truncated to "Unit…" tells the reader nothing, so at
+  // large text sizes the value wraps instead.
+  const stacked = useStackedLayout();
 
   return (
     <View
@@ -158,18 +161,18 @@ function Fact({ label, value, secondary, tone }: FactProps) {
         },
       ]}
     >
-      <Text color="onSurfaceVariant" variant="labelSm">
-        {label.toUpperCase()}
+      <Text color="onSurfaceVariant" uppercase variant="labelSm">
+        {label}
       </Text>
       <Text
-        numberOfLines={1}
+        numberOfLines={stacked ? undefined : 1}
         style={tone === undefined ? undefined : { color: tone }}
         variant="labelMd"
       >
         {value}
       </Text>
       {secondary === undefined ? null : (
-        <Text color="onSurfaceVariant" numberOfLines={1} variant="bodySm">
+        <Text color="onSurfaceVariant" numberOfLines={stacked ? undefined : 1} variant="bodySm">
           {secondary}
         </Text>
       )}

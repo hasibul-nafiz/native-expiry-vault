@@ -52,7 +52,9 @@ export function MonthHeader({ year, month, band, testID }: MonthHeaderProps) {
         <Icon name={bandIcons[band]} size={18} tone={tone.foreground} />
       </View>
       <View style={[styles.labels, { gap: theme.spacing.xs }]}>
-        <Text variant="titleLg">{heading}</Text>
+        <Text uppercase variant="titleLg">
+          {heading}
+        </Text>
         <View
           style={{
             backgroundColor: tone.container,

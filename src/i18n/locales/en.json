@@ -14,7 +14,8 @@
     "loading": "Loading",
     "notSet": "Not set",
     "dismiss": "Dismiss",
-    "listSeparator": " · "
+    "listSeparator": " · ",
+    "requiredField": "{{label}}, required"
   },
   "status": {
     "safe": "Safe",
@@ -38,8 +39,8 @@
     "expiredAgo_one": "Expired {{count}}d ago",
     "expiredAgo_other": "Expired {{count}}d ago",
     "coarseYears": "{{count}}+ years",
-    "daysLeftLabel": "DAYS LEFT",
-    "daysAgoLabel": "DAYS AGO",
+    "daysLeftLabel": "Days left",
+    "daysAgoLabel": "Days ago",
     "elapsed": "{{percent}}% elapsed"
   },
   "dashboard": {
@@ -188,7 +189,7 @@
     "scanBody": "Point the camera at the document and the dates are read for you, on this device.",
     "uploadBody": "Choose from your photo library. Files stay on this device.",
     "noImages": "No images attached. You can add them later.",
-    "attachedCount": "{{count}} ATTACHED",
+    "attachedCount": "{{count}} attached",
     "selectCategory": "Select category",
     "presetsNoteFull": "Presets calibrate smart reminders automatically.",
     "change": "Change",
@@ -197,7 +198,15 @@
     "remindersTitle": "Reminders",
     "remindersNote": "Local notifications only. Nothing leaves this device.",
     "escalationBody": "Daily alerts inside the last {{count}} days.",
-    "stepProgress": "Step {{current}} of {{total}}: {{name}}"
+    "stepProgress": "Step {{current}} of {{total}}: {{name}}",
+    "goToStep": "Go to step {{step}}, {{name}}",
+    "stepNameCategory": "Category",
+    "stepNameCapture": "Capture",
+    "stepNameVerify": "Verify",
+    "stepNameReminders": "Reminders",
+    "removeAttachment": "Remove {{name}}",
+    "dateChosen": "{{label}}, {{value}}",
+    "dateNotChosen": "{{label}}, no date chosen"
   },
   "editItem": {
     "title": "Edit document",
@@ -255,7 +264,10 @@
     "percent": "{{percent}}%",
     "documentNumberLabel": "Document number",
     "reminderScheduleLabel": "Reminder schedule",
-    "offsetDays": "{{count}}d"
+    "offsetDays": "{{count}}d",
+    "viewAttachment": "View {{name}}",
+    "revealNumber": "Show document number",
+    "hideNumber": "Hide document number"
   },
   "reminders": {
     "title": "Reminders",
@@ -320,7 +332,10 @@
     "rationaleTitle": "Scan a document",
     "rationaleBody": "ExpiryVault uses the camera only to read dates off the document in front of it. The image is processed on this device, it is never uploaded, and it is not kept unless you choose to attach it.",
     "deniedBody": "Camera access is switched off for ExpiryVault. You can turn it on in Settings, or add the document another way.",
-    "retryBody": "Try again with the document flat and evenly lit, or type the date in yourself."
+    "retryBody": "Try again with the document flat and evenly lit, or type the date in yourself.",
+    "useDateHint": "Use {{date}} as the expiry date",
+    "captureMode": "{{label}} capture",
+    "candidateSource": "Read from “{{source}}”"
   },
   "lock": {
     "welcome": "Welcome back",
@@ -371,7 +386,8 @@
     "manageBody": "Your vault asks for this PIN when you open it, and again after a minute in the background.",
     "createBody": "Only this PIN and your device biometrics can open the vault. There is no way to recover it.",
     "changePin": "Change PIN",
-    "removePinHint": "Removes the PIN. The vault will open without asking."
+    "removePinHint": "Removes the PIN. The vault will open without asking.",
+    "pinProgress": "{{label}}, {{filled}} of {{total}} digits entered"
   },
   "settings": {
     "title": "Settings",
@@ -494,7 +510,8 @@
   },
   "errors": {
     "genericTitle": "Something went wrong",
-    "genericBody": "Your data has not been changed."
+    "genericBody": "Your data has not been changed.",
+    "boundaryAction": "Try again"
   },
   "tabs": {
     "vault": "Vault",

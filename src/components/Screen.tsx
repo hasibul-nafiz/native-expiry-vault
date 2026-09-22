@@ -11,6 +11,15 @@ export interface ScreenProps {
   /** Applies the design's 20px outer margin. */
   padded?: boolean;
   edges?: readonly Edge[];
+  /**
+   * Set on a screen inside the native tab bar.
+   *
+   * The bar already sits on the bottom safe-area inset, and this library's
+   * insets are window-level rather than per-view, so a tab screen that also
+   * claims `bottom` pads for the home indicator a second time — once under the
+   * tab bar, once above it.
+   */
+  tabBar?: boolean;
   testID?: string;
 }
 
@@ -18,20 +27,29 @@ export function Screen({
   children,
   scroll = false,
   padded = true,
-  edges = ['top', 'bottom', 'left', 'right'],
+  edges,
+  tabBar = false,
   testID,
 }: ScreenProps) {
   const theme = useTheme();
+  const resolvedEdges: readonly Edge[] =
+    edges ?? (tabBar ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']);
   const contentStyle = padded ? { padding: theme.spacing.margin } : null;
 
   return (
     <SafeAreaView
-      edges={edges}
+      edges={resolvedEdges}
       style={[styles.fill, { backgroundColor: theme.colors.surface }]}
       testID={testID}
     >
+      {/*
+        Android resizes the window itself under the default `adjustResize`, so
+        `height` here adjusts a second time and the layout jumps as the keyboard
+        opens. `undefined` leaves Android to the OS and keeps the padding
+        behaviour iOS needs.
+      */}
       <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'padding', default: 'height' })}
+        behavior={Platform.select({ ios: 'padding', default: undefined })}
         style={styles.fill}
       >
         {scroll ? (

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon, StatusBadge, Text, iconForCategory } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
 import { documentStatus } from '@/features/expiry';
-import { minTouchTarget, useTheme } from '@/theme';
+import { minTouchTarget, useStackedLayout, useTheme } from '@/theme';
 
 import { daysLeftLabel } from '../selectors';
 import { formatDate } from '@/i18n';
@@ -24,6 +24,9 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const locale = useLocale();
+  // Four columns of text do not fit at large accessibility sizes; the row
+  // becomes a stack rather than truncating every one of them to nothing.
+  const stacked = useStackedLayout();
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
   const countdown = daysLeftLabel(item.expiryDate, today, t);
@@ -39,7 +42,7 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
         onPress(item);
       }}
       style={({ pressed }) => [
-        styles.row,
+        stacked ? styles.stack : styles.row,
         {
           gap: theme.spacing.md,
           minHeight: minTouchTarget,
@@ -56,29 +59,38 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
         <Icon name={iconForCategory(item.category)} size={22} tone={tone.foreground} />
       </View>
 
-      <View style={styles.textBlock}>
-        <View style={[styles.titleRow, { gap: theme.spacing.sm }]}>
-          <Text numberOfLines={1} style={styles.title} variant="labelLg">
+      <View style={stacked ? styles.blockStacked : styles.textBlock}>
+        <View
+          style={[
+            stacked ? styles.titleStack : styles.titleRow,
+            { gap: theme.spacing.sm },
+          ]}
+        >
+          <Text numberOfLines={stacked ? undefined : 1} style={styles.title} variant="labelLg">
             {item.title}
           </Text>
           <StatusBadge label={t(statusKeys[status])} status={status} />
         </View>
         {subtitle === '' ? null : (
-          <Text color="onSurfaceVariant" numberOfLines={1} variant="bodySm">
+          <Text color="onSurfaceVariant" numberOfLines={stacked ? undefined : 1} variant="bodySm">
             {subtitle}
           </Text>
         )}
       </View>
 
-      <View style={styles.trailing}>
+      <View style={stacked ? styles.trailingStacked : styles.trailing}>
         <Text
-          numberOfLines={1}
+          numberOfLines={stacked ? undefined : 1}
           style={{ color: status === 'expired' ? tone.foreground : theme.colors.onSurface }}
           variant="labelMd"
         >
           {formatDate(item.expiryDate, locale)}
         </Text>
-        <Text numberOfLines={1} style={{ color: tone.foreground }} variant="bodySm">
+        <Text
+          numberOfLines={stacked ? undefined : 1}
+          style={{ color: tone.foreground }}
+          variant="bodySm"
+        >
           {countdown}
         </Text>
       </View>
@@ -89,8 +101,12 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
 const styles = StyleSheet.create({
   iconBox: { alignItems: 'center', height: 44, justifyContent: 'center', width: 44 },
   row: { alignItems: 'center', flexDirection: 'row' },
+  stack: { alignItems: 'flex-start', flexDirection: 'column' },
+  blockStacked: { alignSelf: 'stretch', minWidth: 0 },
   textBlock: { flex: 1, minWidth: 0 },
   title: { flexShrink: 1 },
   titleRow: { alignItems: 'center', flexDirection: 'row' },
+  titleStack: { alignItems: 'flex-start', flexDirection: 'column' },
   trailing: { alignItems: 'flex-end' },
+  trailingStacked: { alignItems: 'flex-start' },
 });

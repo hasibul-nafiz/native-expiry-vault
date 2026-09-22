@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
-  AccessibilityInfo,
   Animated,
   Modal,
   PanResponder,
@@ -33,22 +32,9 @@ export function BottomSheet({ visible, onClose, title, children, testID }: Botto
   // useState rather than useRef: reactCompiler is enabled, and reading a ref's
   // value during render (for the transform below) is unsafe under it.
   const [translateY] = useState(() => new Animated.Value(height));
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
-      if (active) {
-        setReduceMotion(enabled);
-      }
-    });
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-
-    return () => {
-      active = false;
-      subscription.remove();
-    };
-  }, []);
+  // Was subscribed here directly; now one theme-wide flag, so the sheet and
+  // every press animation cannot disagree about the setting.
+  const reduceMotion = theme.reduceMotion;
 
   useEffect(() => {
     Animated.timing(translateY, {

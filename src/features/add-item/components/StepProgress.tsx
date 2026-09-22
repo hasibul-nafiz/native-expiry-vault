@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components';
 import { useTheme } from '@/theme';
 
-import { stepNames, stepNumbers, type StepNumber } from '../schema';
+import { stepNameKeys, stepNumbers, type StepNumber } from '../schema';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -23,17 +23,22 @@ export interface StepProgressProps {
 export function StepProgress({ current, furthestReached, onJump }: StepProgressProps) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const progressLabel = t('addItem.stepProgress', {
+    current,
+    total: 4,
+    name: t(stepNameKeys[current]),
+  });
 
   return (
     <View
-      accessibilityLabel={t('addItem.stepProgress', { current, total: 4, name: stepNames[current] })}
+      accessibilityLabel={progressLabel}
       accessibilityRole="progressbar"
       accessibilityValue={{ max: 4, min: 1, now: current }}
       style={{ gap: theme.spacing.sm }}
       testID="step-progress"
     >
       <Text color="onSurfaceVariant" variant="labelSm">
-        {t('addItem.stepProgress', { current, total: 4, name: stepNames[current] })}
+        {progressLabel}
       </Text>
 
       <View style={[styles.bars, { gap: theme.spacing.xs }]}>
@@ -58,7 +63,7 @@ export function StepProgress({ current, furthestReached, onJump }: StepProgressP
 
           return (
             <Pressable
-              accessibilityLabel={`Go to step ${step}, ${stepNames[step]}`}
+              accessibilityLabel={t('addItem.goToStep', { step, name: t(stepNameKeys[step]) })}
               accessibilityRole="tab"
               accessibilityState={{ disabled: !reachable, selected: step === current }}
               disabled={!reachable}
@@ -74,7 +79,7 @@ export function StepProgress({ current, furthestReached, onJump }: StepProgressP
                 }
                 variant="labelSm"
               >
-                {stepNames[step]}
+                {t(stepNameKeys[step])}
               </Text>
             </Pressable>
           );

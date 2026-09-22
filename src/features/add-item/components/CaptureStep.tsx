@@ -116,7 +116,7 @@ export function CaptureStep({
         </Text>
       ) : (
         <View style={{ gap: theme.spacing.sm }}>
-          <Text color="onSurfaceVariant" variant="labelSm">
+          <Text color="onSurfaceVariant" uppercase variant="labelSm">
             {t('addItem.attachedCount', { count: attachments.length })}
           </Text>
           {attachments.map((attachment) => (
@@ -139,7 +139,7 @@ export function CaptureStep({
                 {attachment.fileName}
               </Text>
               <IconButton
-                accessibilityLabel={`Remove ${attachment.fileName}`}
+                accessibilityLabel={t('addItem.removeAttachment', { name: attachment.fileName })}
                 icon={<Icon color="onSurfaceVariant" name="clear" size={18} />}
                 onPress={() => {
                   onRemove(attachment.uri);

@@ -71,13 +71,15 @@ export function TimelineScreen() {
   const databaseFailed = databaseState.status === 'error';
 
   return (
-    <Screen scroll testID="timeline-screen">
+    <Screen scroll tabBar testID="timeline-screen">
       <View style={{ gap: theme.spacing.md }}>
         <View style={{ gap: theme.spacing.xs }}>
-          <Text color="primary" variant="labelSm">
-            {t('timeline.eyebrow').toUpperCase()}
+          <Text color="primary" uppercase variant="labelSm">
+            {t('timeline.eyebrow')}
           </Text>
-          <Text variant="headlineMd">{t('timeline.title')}</Text>
+          <Text accessibilityRole="header" variant="headlineMd">
+            {t('timeline.title')}
+          </Text>
           <Text color="onSurfaceVariant" variant="bodyMd">
             {t('timeline.subtitle')}
           </Text>

@@ -28,6 +28,20 @@ export const radius = {
 export const minTouchTarget = Platform.select({ ios: 44, default: 48 });
 
 /**
+ * The native tab bar's own height, *excluding* the safe-area inset below it.
+ *
+ * `expo-router/unstable-native-tabs` exposes no height hook — there is no
+ * `useBottomTabBarHeight` for a real `UITabBar` or Material `BottomNavigation`
+ * — so anything that has to clear the bar needs a number. These are the two
+ * platform defaults: 49pt for `UITabBar`, 80dp for M3's navigation bar.
+ *
+ * It lives here rather than in the one screen that needed it, so a second
+ * screen cannot pick a different guess. Verify against a device before release;
+ * it is the kind of constant that changes with an OS version.
+ */
+export const tabBarHeight = Platform.select({ ios: 49, default: 80 });
+
+/**
  * M3 state layers. Components apply these; the dev gallery reuses the same
  * values to render a static pressed preview, so the two can't drift.
  */
