@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import type { DocumentCategory, IsoDate, Item } from '@/db/models';
 
 import { daysUntilExpiry, lifetimeElapsed } from '../expiry/status';
@@ -19,20 +21,18 @@ export const COARSE_COUNTDOWN_DAYS = 730;
 const DAYS_PER_YEAR = 365;
 
 /** The countdown line on every record row: "18d left", "4+ years", "Expired 25d ago". */
-export function daysLeftLabel(expiryDate: IsoDate, today: IsoDate): string {
+export function daysLeftLabel(expiryDate: IsoDate, today: IsoDate, t: TFunction): string {
   const remaining = daysUntilExpiry(expiryDate, today);
 
   if (remaining < 0) {
-    const overdue = Math.abs(remaining);
-
-    return `Expired ${overdue}d ago`;
+    return t('countdown.expiredAgo', { count: Math.abs(remaining) });
   }
 
   if (remaining >= COARSE_COUNTDOWN_DAYS) {
-    return `${Math.floor(remaining / DAYS_PER_YEAR)}+ years`;
+    return t('countdown.coarseYears', { count: Math.floor(remaining / DAYS_PER_YEAR) });
   }
 
-  return `${remaining}d left`;
+  return t('countdown.daysLeft', { count: remaining });
 }
 
 /** "88% elapsed", or null when the item has no issue date to measure from. */
@@ -40,6 +40,7 @@ export function elapsedLabel(
   issueDate: IsoDate | null,
   expiryDate: IsoDate,
   today: IsoDate,
+  t: TFunction,
 ): string | null {
   const elapsed = lifetimeElapsed(issueDate, expiryDate, today);
 
@@ -47,7 +48,7 @@ export function elapsedLabel(
     return null;
   }
 
-  return `${Math.round(elapsed * 100)}% elapsed`;
+  return t('countdown.elapsed', { percent: Math.round(elapsed * 100) });
 }
 
 /** 0-1 for the progress bar, or null when there is no issue date. */
@@ -75,15 +76,17 @@ export interface CategoryFilter {
   count: number;
 }
 
-const categoryLabels: Record<DocumentCategory, string> = {
-  passport: 'Passports',
-  visa: 'Visas',
-  health: 'Health',
-  license: 'Licenses',
-  warranty: 'Warranties',
-  contract: 'Contracts',
-  other: 'Other',
+const categoryKeys: Record<DocumentCategory, string> = {
+  passport: 'category.passport',
+  visa: 'category.visa',
+  health: 'category.health',
+  license: 'category.license',
+  warranty: 'category.warranty',
+  contract: 'category.contract',
+  other: 'category.other',
 };
+
+export const documentCategoryOrder = Object.keys(categoryKeys) as DocumentCategory[];
 
 /**
  * The filter chip row: "All" first, then only the categories that actually have
@@ -92,48 +95,49 @@ const categoryLabels: Record<DocumentCategory, string> = {
 export function buildCategoryFilters(
   countsByCategory: Partial<Record<DocumentCategory, number>>,
   total: number,
+  t: TFunction,
 ): CategoryFilter[] {
   if (total === 0) {
     return [];
   }
 
-  const present = (Object.keys(categoryLabels) as DocumentCategory[])
+  const present = documentCategoryOrder
     .filter((category) => (countsByCategory[category] ?? 0) > 0)
     .map((category) => ({
       category,
-      label: categoryLabels[category],
+      label: categoryLabel(category, t),
       count: countsByCategory[category] ?? 0,
     }));
 
-  return [{ category: null, label: 'All', count: total }, ...present];
+  return [{ category: null, label: t('common.all'), count: total }, ...present];
 }
 
-export function categoryLabel(category: DocumentCategory): string {
-  return categoryLabels[category];
+export function categoryLabel(category: DocumentCategory, t: TFunction): string {
+  return t(categoryKeys[category]);
 }
 
 /** The header greeting. Takes a Date because it is about the time, not the date. */
-export function greetingFor(now: Date): string {
+export function greetingFor(now: Date, t: TFunction): string {
   const hour = now.getHours();
 
   if (hour < 12) {
-    return 'Good morning';
+    return t('dashboard.greetingMorning');
   }
 
   if (hour < 18) {
-    return 'Good afternoon';
+    return t('dashboard.greetingAfternoon');
   }
 
-  return 'Good evening';
+  return t('dashboard.greetingEvening');
 }
 
 /** "Residence Permit (18 days)" for the hero card's next-renewal line. */
-export function nextRenewalLabel(item: Item, today: IsoDate): string {
+export function nextRenewalLabel(item: Item, today: IsoDate, t: TFunction): string {
   const remaining = daysUntilExpiry(item.expiryDate, today);
 
   if (remaining < 0) {
-    return `${item.title} (expired)`;
+    return t('dashboard.nextRenewalExpired', { title: item.title });
   }
 
-  return `${item.title} (${remaining} ${remaining === 1 ? 'day' : 'days'})`;
+  return t('dashboard.nextRenewal', { title: item.title, count: remaining });
 }

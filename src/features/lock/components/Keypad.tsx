@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, Text, type IconName } from '@/components';
 import { minTouchTarget, useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The PIN keypad.
@@ -46,7 +47,11 @@ export interface KeypadProps {
   disabled?: boolean;
 }
 
+/** The zero key. A digit glyph, not copy, so it is not translated. */
+const ZERO = '0';
+
 export function Keypad({ onDigit, onBackspace, action, disabled = false }: KeypadProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const keyStyle = (pressed: boolean, tinted: boolean) => [
@@ -116,12 +121,12 @@ export function Keypad({ onDigit, onBackspace, action, disabled = false }: Keypa
         testID="keypad-0"
       >
         <Text maxFontSizeMultiplier={1.4} variant="headlineMd">
-          0
+          {ZERO}
         </Text>
       </Pressable>
 
       <Pressable
-        accessibilityLabel="Delete last digit"
+        accessibilityLabel={t('lock.backspace')}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
         android_ripple={disabled ? undefined : { color: theme.colors.surfaceContainerHighest }}

@@ -6,6 +6,7 @@ import { minTouchTarget, useTheme } from '@/theme';
 
 import { presetFor } from '../categoryPresets';
 import type { AddItemFormValues } from '../schema';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The reminder step.
@@ -48,6 +49,7 @@ export function RemindersStep({
   escalationEnabled,
   onEscalationChange,
 }: RemindersStepProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const offsets = category === undefined ? [] : presetFor(category).offsets;
 
@@ -55,10 +57,10 @@ export function RemindersStep({
     <View style={{ gap: theme.spacing.md }}>
       <View style={{ gap: theme.spacing.xs }}>
         <Text accessibilityRole="header" variant="titleLg">
-          Reminders
+          {t('addItem.remindersTitle')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          Local notifications only. Nothing leaves this device.
+          {t('addItem.remindersNote')}
         </Text>
       </View>
 
@@ -130,13 +132,13 @@ export function RemindersStep({
         ]}
       >
         <View style={styles.rowText}>
-          <Text variant="labelLg">Escalation mode</Text>
+          <Text variant="labelLg">{t('addItem.escalationLabel')}</Text>
           <Text color="onSurfaceVariant" variant="bodySm">
-            {`Daily alerts inside the last ${ESCALATION_THRESHOLD_DAYS} days.`}
+            {t('addItem.escalationBody', { count: ESCALATION_THRESHOLD_DAYS })}
           </Text>
         </View>
         <Switch
-          accessibilityLabel="Escalation mode"
+          accessibilityLabel="{t('addItem.escalationLabel')}"
           onValueChange={onEscalationChange}
           testID="escalation-switch"
           thumbColor={theme.colors.surfaceContainerLowest}

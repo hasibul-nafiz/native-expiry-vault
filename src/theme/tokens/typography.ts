@@ -14,6 +14,19 @@ export const fontFamilies = {
   bold: 'Inter_700Bold',
 } as const;
 
+/**
+ * Bengali has no coverage in Inter, so `bn` renders in Noto Sans Bengali at the
+ * matching weights. Keyed by the Inter family name, which is what every
+ * typography variant already carries — so a variant needs no Bengali twin and
+ * the two can never drift apart.
+ */
+export const bengaliFontFamilies: Readonly<Record<string, string>> = {
+  [fontFamilies.regular]: 'NotoSansBengali_400Regular',
+  [fontFamilies.medium]: 'NotoSansBengali_500Medium',
+  [fontFamilies.semiBold]: 'NotoSansBengali_600SemiBold',
+  [fontFamilies.bold]: 'NotoSansBengali_700Bold',
+};
+
 export const typography = {
   displayLg: { fontFamily: fontFamilies.bold, fontSize: 36, lineHeight: 44, letterSpacing: -0.72 },
   displayLgMobile: {

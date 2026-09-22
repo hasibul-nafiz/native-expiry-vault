@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { pinProblemMessage } from './labels';
+import { pinProblemKey } from './labels';
 import { lockStorage, type LockStoragePort } from './lockStorage';
 import { PIN_LENGTH, validatePin, verifyPin } from './pin';
 import { setLockEnrolled } from './useLockState';
@@ -26,6 +26,7 @@ export type SetPinStage =
 export interface SetPinModel {
   stage: SetPinStage;
   entry: string;
+  /** A translation key, resolved by the screen. */
   message: string | null;
   busy: boolean;
   /** Set once the PIN has been enrolled, changed or removed. */
@@ -63,7 +64,7 @@ export function useSetPin({ enrolled, storage = lockStorage }: UseSetPinOptions)
               setStage('manage');
               setMessage(null);
             } else {
-              setMessage('Incorrect PIN.');
+              setMessage('lock.incorrectPin');
             }
 
             break;
@@ -73,7 +74,7 @@ export function useSetPin({ enrolled, storage = lockStorage }: UseSetPinOptions)
             const validation = validatePin(pin);
 
             if (!validation.ok) {
-              setMessage(pinProblemMessage(validation.problem));
+              setMessage(pinProblemKey(validation.problem));
 
               break;
             }
@@ -89,7 +90,7 @@ export function useSetPin({ enrolled, storage = lockStorage }: UseSetPinOptions)
             if (pin !== first) {
               setStage('create');
               setFirst('');
-              setMessage('Those PINs did not match. Start again.');
+              setMessage('lock.pinMismatch');
 
               break;
             }

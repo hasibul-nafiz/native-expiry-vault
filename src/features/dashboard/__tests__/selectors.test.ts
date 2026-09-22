@@ -13,8 +13,10 @@ import {
 } from '../selectors';
 
 import { addDays } from '@/features/expiry';
+import { testT } from '@/i18n/testing';
 
 const TODAY = '2026-09-20';
+const t = testT();
 
 function inDays(days: number): string {
   return addDays(TODAY, days);
@@ -50,14 +52,14 @@ describe('daysLeftLabel', () => {
     ['the export’s 389-day case, still in days', 389, '389d left'],
     ['one day under the coarse cutoff', COARSE_COUNTDOWN_DAYS - 1, '729d left'],
   ])('renders %s', (_label, days, expected) => {
-    expect(daysLeftLabel(inDays(days), TODAY)).toBe(expected);
+    expect(daysLeftLabel(inDays(days), TODAY, t)).toBe(expected);
   });
 
   it.each([
     ['exactly at the cutoff', COARSE_COUNTDOWN_DAYS, '2+ years'],
     ['the export’s multi-year case', 1642, '4+ years'],
   ])('switches to years %s', (_label, days, expected) => {
-    expect(daysLeftLabel(inDays(days), TODAY)).toBe(expected);
+    expect(daysLeftLabel(inDays(days), TODAY, t)).toBe(expected);
   });
 
   it.each([
@@ -65,33 +67,33 @@ describe('daysLeftLabel', () => {
     ['the export’s 25-day case', -25, 'Expired 25d ago'],
     ['long expired', -400, 'Expired 400d ago'],
   ])('renders %s', (_label, days, expected) => {
-    expect(daysLeftLabel(inDays(days), TODAY)).toBe(expected);
+    expect(daysLeftLabel(inDays(days), TODAY, t)).toBe(expected);
   });
 
   it('treats the cutoff as the boundary between the two formats', () => {
-    expect(daysLeftLabel(inDays(COARSE_COUNTDOWN_DAYS - 1), TODAY)).toMatch(/d left$/);
-    expect(daysLeftLabel(inDays(COARSE_COUNTDOWN_DAYS), TODAY)).toMatch(/\+ years$/);
+    expect(daysLeftLabel(inDays(COARSE_COUNTDOWN_DAYS - 1), TODAY, t)).toMatch(/d left$/);
+    expect(daysLeftLabel(inDays(COARSE_COUNTDOWN_DAYS), TODAY, t)).toMatch(/\+ years$/);
   });
 });
 
 describe('elapsedLabel', () => {
   it('returns null without an issue date, so the bar can be hidden', () => {
-    expect(elapsedLabel(null, '2031-05-14', TODAY)).toBeNull();
+    expect(elapsedLabel(null, '2031-05-14', TODAY, t)).toBeNull();
     expect(elapsedFraction(null, '2031-05-14', TODAY)).toBeNull();
   });
 
   it('renders a percentage', () => {
-    expect(elapsedLabel('2026-09-10', '2026-09-30', TODAY)).toBe('50% elapsed');
+    expect(elapsedLabel('2026-09-10', '2026-09-30', TODAY, t)).toBe('50% elapsed');
   });
 
   it('reproduces the export’s 88% case', () => {
     // Issued 2022-10-29, expires 2025-10-28, viewed 2025-10-10.
-    expect(elapsedLabel('2022-10-29', '2025-10-28', '2025-10-10')).toBe('98% elapsed');
+    expect(elapsedLabel('2022-10-29', '2025-10-28', '2025-10-10', t)).toBe('98% elapsed');
   });
 
   it('clamps past the ends', () => {
-    expect(elapsedLabel('2026-09-10', '2026-09-30', '2026-01-01')).toBe('0% elapsed');
-    expect(elapsedLabel('2026-09-10', '2026-09-30', '2027-01-01')).toBe('100% elapsed');
+    expect(elapsedLabel('2026-09-10', '2026-09-30', '2026-01-01', t)).toBe('0% elapsed');
+    expect(elapsedLabel('2026-09-10', '2026-09-30', '2027-01-01', t)).toBe('100% elapsed');
   });
 });
 
@@ -123,23 +125,23 @@ describe('selectUrgentItems', () => {
 
 describe('buildCategoryFilters', () => {
   it('returns nothing for an empty vault rather than a row of zeroes', () => {
-    expect(buildCategoryFilters({}, 0)).toEqual([]);
+    expect(buildCategoryFilters({}, 0, t)).toEqual([]);
   });
 
   it('leads with an All chip carrying the total', () => {
-    const filters = buildCategoryFilters({ passport: 3, visa: 4 }, 7);
+    const filters = buildCategoryFilters({ passport: 3, visa: 4 }, 7, t);
 
     expect(filters[0]).toEqual({ category: null, label: 'All', count: 7 });
   });
 
   it('includes only categories that have items', () => {
-    const filters = buildCategoryFilters({ passport: 3, visa: 4, warranty: 0 }, 7);
+    const filters = buildCategoryFilters({ passport: 3, visa: 4, warranty: 0 }, 7, t);
 
     expect(filters.map((filter) => filter.category)).toEqual([null, 'passport', 'visa']);
   });
 
   it('keeps the counts', () => {
-    const filters = buildCategoryFilters({ passport: 3, visa: 4 }, 7);
+    const filters = buildCategoryFilters({ passport: 3, visa: 4 }, 7, t);
 
     expect(filters.map((filter) => filter.count)).toEqual([7, 3, 4]);
   });
@@ -153,7 +155,7 @@ describe('buildCategoryFilters', () => {
     ['contract', 'Contracts'],
     ['other', 'Other'],
   ])('labels %s as %s', (category, label) => {
-    expect(categoryLabel(category)).toBe(label);
+    expect(categoryLabel(category, t)).toBe(label);
   });
 });
 
@@ -166,7 +168,7 @@ describe('greetingFor', () => {
     [18, 'Good evening'],
     [23, 'Good evening'],
   ])('at %i:00 says %s', (hour, expected) => {
-    expect(greetingFor(new Date(2026, 8, 20, hour, 30))).toBe(expected);
+    expect(greetingFor(new Date(2026, 8, 20, hour, 30), t)).toBe(expected);
   });
 });
 
@@ -174,14 +176,14 @@ describe('nextRenewalLabel', () => {
   it('reproduces the export’s "Residence Permit (18 days)" line', () => {
     const permit = item({ title: 'Residence Permit', expiryDate: inDays(18) });
 
-    expect(nextRenewalLabel(permit, TODAY)).toBe('Residence Permit (18 days)');
+    expect(nextRenewalLabel(permit, TODAY, t)).toBe('Residence Permit (18 days)');
   });
 
   it('singularises one day', () => {
-    expect(nextRenewalLabel(item({ expiryDate: inDays(1) }), TODAY)).toBe('Passport (1 day)');
+    expect(nextRenewalLabel(item({ expiryDate: inDays(1) }), TODAY, t)).toBe('Passport (1 day)');
   });
 
   it('marks an expired item rather than showing a negative count', () => {
-    expect(nextRenewalLabel(item({ expiryDate: inDays(-5) }), TODAY)).toBe('Passport (expired)');
+    expect(nextRenewalLabel(item({ expiryDate: inDays(-5) }), TODAY, t)).toBe('Passport (expired)');
   });
 });

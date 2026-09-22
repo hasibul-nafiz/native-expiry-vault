@@ -3,6 +3,7 @@ import { AppState } from 'react-native';
 
 import { useDatabaseState } from '@/db/DatabaseProvider';
 import { notificationPort, type NotificationPort } from '@/services/notifications';
+import { usePreferences } from '@/settings/store';
 
 import {
   reminderSyncFailed,
@@ -35,6 +36,7 @@ export interface UseReminderSyncOptions {
 export function useReminderSync({ port = notificationPort }: UseReminderSyncOptions = {}): void {
   const databaseState = useDatabaseState();
   const { revision } = useReminderState();
+  const { reminderHour } = usePreferences();
 
   const db = databaseState.status === 'ready' ? databaseState.db : null;
 
@@ -47,7 +49,7 @@ export function useReminderSync({ port = notificationPort }: UseReminderSyncOpti
 
     reminderSyncStarted();
 
-    syncNotifications(db, port)
+    syncNotifications(db, port, { hour: reminderHour })
       .then((outcome) => {
         if (active) {
           reminderSyncSucceeded(outcome);
@@ -64,7 +66,7 @@ export function useReminderSync({ port = notificationPort }: UseReminderSyncOpti
     return () => {
       active = false;
     };
-  }, [db, port, revision]);
+  }, [db, port, revision, reminderHour]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (status) => {

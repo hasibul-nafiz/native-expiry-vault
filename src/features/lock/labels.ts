@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import type { IconName } from '@/components';
 import type { BiometricKind } from '@/services/biometrics';
 
@@ -5,32 +7,33 @@ import { FREE_ATTEMPTS, type AttemptState } from './backoff';
 import type { PinProblem } from './pin';
 
 /**
- * Every user-facing string the lock renders, in one file.
+ * Translation-key helpers for the lock.
  *
- * Inline English, like F3 through F8 — the i18n layer arrives at F11, and
- * keeping the copy in one module is what makes that extraction a single file
- * rather than a sweep through six components.
+ * These used to hold the English copy directly; F11 moved the strings into
+ * `src/i18n/locales` and left the *rules* here — which attempt count warrants a
+ * warning, how a duration is broken into minutes and seconds — because those
+ * are logic, not copy, and are worth testing independently of language.
  */
 
 /**
  * Apple's marks are the only correct name for the thing on iOS, and users look
- * for them. Android's sensors have no such universal name, so the copy stays
- * generic rather than guessing at a vendor's.
+ * for them, so they are not translated. Android's sensors have no such
+ * universal name, so those keys carry generic copy that is.
  */
-export function biometricLabel(kind: BiometricKind): string {
+export function biometricLabelKey(kind: BiometricKind): string {
   switch (kind) {
     case 'faceId':
-      return 'Face ID';
+      return 'lock.biometricFaceId';
     case 'touchId':
-      return 'Touch ID';
+      return 'lock.biometricTouchId';
     case 'face':
-      return 'face unlock';
+      return 'lock.biometricFace';
     case 'fingerprint':
-      return 'your fingerprint';
+      return 'lock.biometricFingerprint';
     case 'iris':
-      return 'iris unlock';
+      return 'lock.biometricIris';
     case 'none':
-      return 'biometrics';
+      return 'lock.biometricGeneric';
   }
 }
 
@@ -38,40 +41,39 @@ export function biometricIcon(kind: BiometricKind): IconName {
   return kind === 'faceId' || kind === 'face' ? 'biometricFace' : 'biometricFingerprint';
 }
 
-export function pinProblemMessage(problem: PinProblem): string {
+export function pinProblemKey(problem: PinProblem): string {
   switch (problem) {
     case 'length':
-      return 'Your PIN must be 6 digits.';
+      return 'lock.pinLength';
     case 'digits':
-      return 'Your PIN can only contain digits.';
+      return 'lock.pinDigits';
     case 'weak':
-      return 'That PIN is too easy to guess. Avoid repeats and runs like 111111 or 123456.';
+      return 'lock.pinWeak';
   }
 }
 
-function plural(count: number, noun: string): string {
-  return `${count} ${noun}${count === 1 ? '' : 's'}`;
-}
-
 /** "1 minute 30 seconds", rounded up so the countdown never shows a stale 0. */
-export function formatDuration(ms: number): string {
+export function formatDuration(ms: number, t: TFunction): string {
   const totalSeconds = Math.ceil(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
   if (minutes === 0) {
-    return plural(seconds, 'second');
+    return t('lock.seconds', { count: seconds });
   }
 
   if (seconds === 0) {
-    return plural(minutes, 'minute');
+    return t('lock.minutes', { count: minutes });
   }
 
-  return `${plural(minutes, 'minute')} ${plural(seconds, 'second')}`;
+  return t('lock.durationCombined', {
+    minutes: t('lock.minutes', { count: minutes }),
+    seconds: t('lock.seconds', { count: seconds }),
+  });
 }
 
-export function lockoutMessage(remainingMs: number): string {
-  return `Too many attempts. Try again in ${formatDuration(remainingMs)}.`;
+export function lockoutMessage(remainingMs: number, t: TFunction): string {
+  return t('lock.lockout', { duration: formatDuration(remainingMs, t) });
 }
 
 /**
@@ -79,12 +81,12 @@ export function lockoutMessage(remainingMs: number): string {
  * first mistype reads as an accusation; staying quiet until the last two is the
  * point at which the information is actually useful.
  */
-export function wrongPinMessage(attempts: AttemptState): string {
+export function wrongPinMessage(attempts: AttemptState, t: TFunction): string {
   const left = Math.max(FREE_ATTEMPTS - attempts.failures, 0);
 
   if (left > 0 && left <= 2) {
-    return `Incorrect PIN. ${plural(left, 'attempt')} left before a timeout.`;
+    return t('lock.incorrectPinAttempts', { count: left });
   }
 
-  return 'Incorrect PIN.';
+  return t('lock.incorrectPin');
 }

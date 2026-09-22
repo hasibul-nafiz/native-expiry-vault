@@ -4,6 +4,7 @@ import { Button, Icon, IconButton, Text } from '@/components';
 import { useTheme } from '@/theme';
 
 import type { PickedAttachment } from '../schema';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The capture step: how the document's image gets in.
@@ -31,22 +32,23 @@ export function CaptureStep({
   picking,
   error,
 }: CaptureStepProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
     <View style={{ gap: theme.spacing.md }}>
       <View style={{ gap: theme.spacing.xs }}>
         <Text accessibilityRole="header" variant="titleLg">
-          Capture method
+          {t('addItem.captureMethod')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          Attach a photo of the document, or continue and type the details in.
+          {t('addItem.captureBody')}
         </Text>
       </View>
 
       <Pressable
-        accessibilityHint="Opens the camera to read the expiry date"
-        accessibilityLabel="Scan the document with the camera"
+        accessibilityHint={t('addItem.scanHint')}
+        accessibilityLabel={t('addItem.scanTitle')}
         accessibilityRole="button"
         onPress={onScan}
         style={({ pressed }) => [
@@ -65,16 +67,16 @@ export function CaptureStep({
       >
         <Icon color="primary" name="search" size={24} />
         <View style={styles.optionText}>
-          <Text variant="labelLg">Camera OCR scan</Text>
+          <Text variant="labelLg">{t('addItem.scanTile')}</Text>
           <Text color="onSurfaceVariant" variant="bodySm">
-            Point the camera at the document and the dates are read for you, on this device.
+            {t('addItem.scanBody')}
           </Text>
         </View>
       </Pressable>
 
       <Pressable
-        accessibilityHint="Opens your photo library"
-        accessibilityLabel="Add photos from your library"
+        accessibilityHint={t('addItem.addPhotosHint')}
+        accessibilityLabel={t('addItem.addPhotos')}
         accessibilityRole="button"
         accessibilityState={{ busy: picking }}
         disabled={picking}
@@ -95,9 +97,9 @@ export function CaptureStep({
       >
         <Icon color="primary" name="document" size={24} />
         <View style={styles.optionText}>
-          <Text variant="labelLg">Upload image</Text>
+          <Text variant="labelLg">{t('addItem.uploadTile')}</Text>
           <Text color="onSurfaceVariant" variant="bodySm">
-            Choose from your photo library. Files stay on this device.
+            {t('addItem.uploadBody')}
           </Text>
         </View>
       </Pressable>
@@ -110,12 +112,12 @@ export function CaptureStep({
 
       {attachments.length === 0 ? (
         <Text color="onSurfaceVariant" testID="capture-none" variant="bodySm">
-          No images attached. You can add them later.
+          {t('addItem.noImages')}
         </Text>
       ) : (
         <View style={{ gap: theme.spacing.sm }}>
           <Text color="onSurfaceVariant" variant="labelSm">
-            {`${attachments.length} ATTACHED`}
+            {t('addItem.attachedCount', { count: attachments.length })}
           </Text>
           {attachments.map((attachment) => (
             <View
@@ -150,7 +152,7 @@ export function CaptureStep({
       )}
 
       {picking ? (
-        <Button disabled label="Opening library…" loading onPress={() => undefined} />
+        <Button disabled label={t('addItem.openingLibrary')} loading onPress={() => undefined} />
       ) : null}
     </View>
   );

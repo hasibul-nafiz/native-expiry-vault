@@ -2,6 +2,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button, Icon, Text } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from '@/theme';
 
 import { nextRenewalLabel } from '../selectors';
@@ -24,6 +26,7 @@ export interface VaultHeroCardProps {
 
 export function VaultHeroCard({ total, nextRenewal, today, onViewNext }: VaultHeroCardProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -42,14 +45,14 @@ export function VaultHeroCard({ total, nextRenewal, today, onViewNext }: VaultHe
       <View style={styles.headerRow}>
         <View style={{ gap: theme.spacing.xs }}>
           <Text color="onPrimary" variant="labelSm">
-            PERSONAL VAULT
+            {t('dashboard.heroEyebrow').toUpperCase()}
           </Text>
           <View style={[styles.countRow, { gap: theme.spacing.sm }]}>
             <Text color="onPrimary" testID="vault-hero-total" variant="displayLgMobile">
               {String(total)}
             </Text>
             <Text color="onPrimary" variant="bodyMd">
-              {total === 1 ? 'Document tracked' : 'Documents tracked'}
+              {t('dashboard.documentsTracked', { count: total })}
             </Text>
           </View>
         </View>
@@ -80,16 +83,16 @@ export function VaultHeroCard({ total, nextRenewal, today, onViewNext }: VaultHe
         >
           <View style={[styles.nextText, { gap: theme.spacing.xs }]}>
             <Text color="onPrimary" variant="labelSm">
-              Next renewal
+              {t('dashboard.nextRenewalLabel')}
             </Text>
             <Text color="onPrimary" numberOfLines={1} variant="labelMd">
-              {nextRenewalLabel(nextRenewal, today)}
+              {nextRenewalLabel(nextRenewal, today, t)}
             </Text>
           </View>
 
           <Button
-            accessibilityHint={`Opens ${nextRenewal.title}`}
-            label="View"
+            accessibilityHint={t('dashboard.recordHint')}
+            label={t('common.view')}
             onPress={() => {
               onViewNext(nextRenewal);
             }}

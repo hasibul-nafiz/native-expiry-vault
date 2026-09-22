@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { Button, Icon, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * A launcher, not the scanner.
@@ -15,6 +16,7 @@ import { useTheme } from '@/theme';
  * being used, rather than held open behind a tab.
  */
 export default function ScanTabScreen() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
 
@@ -27,17 +29,15 @@ export default function ScanTabScreen() {
       <View style={{ gap: theme.spacing.md }}>
         <Icon color="primary" name="search" size={32} />
         <Text accessibilityRole="header" variant="headlineMd">
-          Scan a document
+          {t('scanTab.title')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          Point the camera at a passport, permit or policy and ExpiryVault reads the expiry date
-          off it. Recognition happens on this device — no image is ever uploaded.
+          {t('scanTab.body')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodySm">
-          You will always be asked to confirm the date before anything is saved, and you can type
-          it in yourself at any point.
+          {t('scanTab.note')}
         </Text>
-        <Button label="Open the scanner" onPress={open} testID="scan-launch" />
+        <Button label={t('scanTab.open')} onPress={open} testID="scan-launch" />
       </View>
     </Screen>
   );

@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 
 import { Keypad } from './components/Keypad';
 import { PinDots } from './components/PinDots';
+import { PIN_LENGTH } from './pin';
 import { useLockState } from './useLockState';
 import { useSetPin, type SetPinStage } from './useSetPin';
 
@@ -23,22 +26,23 @@ export interface SetPinScreenProps {
   storage?: Parameters<typeof useSetPin>[0]['storage'];
 }
 
-const PROMPTS: Record<SetPinStage, string> = {
-  current: 'Enter your current PIN',
-  manage: 'App lock is on',
-  create: 'Choose a 6-digit PIN',
-  confirm: 'Enter it again to confirm',
+const PROMPT_KEYS: Record<SetPinStage, string> = {
+  current: 'lock.promptCurrent',
+  manage: 'lock.promptManage',
+  create: 'lock.promptCreate',
+  confirm: 'lock.promptConfirm',
 };
 
-const DOT_LABELS: Record<SetPinStage, string> = {
-  current: 'Current PIN',
-  manage: 'PIN',
-  create: 'New PIN',
-  confirm: 'Confirm new PIN',
+const DOT_LABEL_KEYS: Record<SetPinStage, string> = {
+  current: 'lock.dotsCurrent',
+  manage: 'lock.masterPin',
+  create: 'lock.dotsNew',
+  confirm: 'lock.dotsConfirm',
 };
 
 export function SetPinScreen({ onDone, storage }: SetPinScreenProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enrolled } = useLockState();
   const { stage, entry, message, busy, done, pressDigit, pressBackspace, chooseChange, chooseRemove } =
     useSetPin({ enrolled, storage });
@@ -53,21 +57,19 @@ export function SetPinScreen({ onDone, storage }: SetPinScreenProps) {
     <Screen scroll>
       <View style={[styles.content, { gap: theme.spacing.lg }]}>
         <View style={[styles.header, { gap: theme.spacing.sm }]}>
-          <Text variant="headlineMd">App lock</Text>
+          <Text variant="headlineMd">{t('settings.appLock')}</Text>
           <Text color="onSurfaceVariant" style={styles.centred} variant="bodySm">
-            {stage === 'manage'
-              ? 'Your vault asks for this PIN when you open it, and again after a minute in the background.'
-              : 'Only this PIN and your device biometrics can open the vault. There is no way to recover it.'}
+            {stage === 'manage' ? t('lock.manageBody') : t('lock.createBody')}
           </Text>
         </View>
 
         {stage === 'manage' ? (
           <View style={{ gap: theme.spacing.md }}>
-            <Button label="Change PIN" onPress={chooseChange} testID="change-pin" />
+            <Button label={t('lock.changePin')} onPress={chooseChange} testID="change-pin" />
             <Button
-              accessibilityHint="Removes the PIN. The vault will open without asking."
+              accessibilityHint={t('lock.removePinHint')}
               disabled={busy}
-              label="Turn off app lock"
+              label={t('lock.removePin')}
               onPress={chooseRemove}
               testID="remove-pin"
               variant="secondary"
@@ -79,7 +81,7 @@ export function SetPinScreen({ onDone, storage }: SetPinScreenProps) {
               <PinDots
                 filled={entry.length}
                 invalid={message !== null}
-                label={DOT_LABELS[stage]}
+                label={t(DOT_LABEL_KEYS[stage])}
               />
               <Text
                 accessibilityLiveRegion="polite"
@@ -87,7 +89,7 @@ export function SetPinScreen({ onDone, storage }: SetPinScreenProps) {
                 style={styles.centred}
                 variant="labelSm"
               >
-                {message ?? PROMPTS[stage]}
+                {message === null ? t(PROMPT_KEYS[stage], { digits: PIN_LENGTH }) : t(message)}
               </Text>
             </View>
 

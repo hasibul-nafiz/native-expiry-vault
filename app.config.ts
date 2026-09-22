@@ -103,6 +103,9 @@ const config: ExpoConfig = {
         defaultChannel: 'reminders',
       },
     ],
+    // Declares the supported locales to the OS so the system language picker
+    // lists the app. Detection itself happens at runtime in `src/i18n`.
+    'expo-localization',
     [
       'expo-splash-screen',
       {

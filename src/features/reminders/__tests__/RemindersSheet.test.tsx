@@ -13,6 +13,9 @@ import { ThemeProvider } from '@/theme';
 import type { PlannedNotification } from '../computeReminders';
 import { RemindersSheet, summaryLine } from '../RemindersSheet';
 import { reminderSyncSucceeded, resetReminderStore } from '../reminderStore';
+import { testT } from '@/i18n/testing';
+
+const t = testT();
 
 const metrics = {
   frame: { x: 0, y: 0, width: 390, height: 844 },
@@ -144,7 +147,9 @@ describe('RemindersSheet', () => {
 
     wrap(<RemindersSheet onClose={jest.fn()} port={port} visible />);
 
-    expect(await screen.findByTestId('reminders-summary')).toHaveTextContent(/2027-01-05/);
+    // F11 renders dates through Intl, so the summary carries the formatted
+    // date rather than the raw ISO string the repository stores.
+    expect(await screen.findByTestId('reminders-summary')).toHaveTextContent(/Jan 5, 2027/);
   });
 
   it('asks the OS nothing while closed', () => {
@@ -157,17 +162,17 @@ describe('RemindersSheet', () => {
 
 describe('summaryLine', () => {
   it('reads naturally for one reminder', () => {
-    expect(summaryLine(1, '2027-01-05', '2026-09-20')).toBe(
-      '1 reminder is scheduled, covering everything due up to 2027-01-05.',
+    expect(summaryLine(1, '2027-01-05', '2026-09-20', t)).toBe(
+      '1 reminder is scheduled, covering everything due up to Jan 5, 2027.',
     );
   });
 
   it('pluralises', () => {
-    expect(summaryLine(4, '2027-01-05', '2026-09-20')).toContain('4 reminders are scheduled');
+    expect(summaryLine(4, '2027-01-05', '2026-09-20', t)).toContain('4 reminders are scheduled');
   });
 
   it('omits a horizon that is not in the future', () => {
-    expect(summaryLine(2, '2026-09-20', '2026-09-20')).toBe('2 reminders are scheduled.');
-    expect(summaryLine(2, null, '2026-09-20')).toBe('2 reminders are scheduled.');
+    expect(summaryLine(2, '2026-09-20', '2026-09-20', t)).toBe('2 reminders are scheduled.');
+    expect(summaryLine(2, null, '2026-09-20', t)).toBe('2 reminders are scheduled.');
   });
 });

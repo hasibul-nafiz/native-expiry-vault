@@ -7,6 +7,7 @@ import { useTheme } from '@/theme';
 
 import type { DateCandidate } from './parseDates';
 import type { ScanResult } from './scanImage';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Where a scan becomes a date the user has agreed to.
@@ -41,6 +42,7 @@ export function ScanConfirmSheet({
   onRetake,
   onEnterManually,
 }: ScanConfirmSheetProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const found = result !== null && result.candidates.length > 0;
 
@@ -55,7 +57,7 @@ export function ScanConfirmSheet({
         {imageUri === null ? null : (
           <Image
             accessibilityIgnoresInvertColors
-            accessibilityLabel="The document you captured"
+            accessibilityLabel={t('scan.capturedAlt')}
             source={{ uri: imageUri }}
             style={[styles.preview, { borderRadius: theme.radius.md }]}
             testID="scan-preview"
@@ -65,7 +67,7 @@ export function ScanConfirmSheet({
         {found ? (
           <Fragment>
             <Text color="onSurfaceVariant" variant="bodyMd">
-              Everything was read on this device. Pick the expiry date, or type it in yourself.
+              {t('scan.confirmBody')}
             </Text>
 
             <View style={{ gap: theme.spacing.sm }} testID="scan-candidates">
@@ -82,8 +84,7 @@ export function ScanConfirmSheet({
           </Fragment>
         ) : (
           <Text color="onSurfaceVariant" testID="scan-nothing-found" variant="bodyMd">
-            No expiry date could be read from this image. Try again with the document flat and
-            evenly lit, or type the date in yourself.
+            {t('scan.noDateFound')} {t('scan.retryBody')}
           </Text>
         )}
 
@@ -94,7 +95,7 @@ export function ScanConfirmSheet({
           variant="secondary"
         />
         <Button
-          label="Type it in instead"
+          label={t('scan.typeItIn')}
           onPress={onEnterManually}
           testID="scan-manual"
           variant="ghost"
@@ -117,6 +118,7 @@ interface CandidateRowsProps {
  * to dismiss without reading; two buttons cannot be answered without choosing.
  */
 function CandidateRows({ candidate, onConfirm }: CandidateRowsProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   if (!candidate.ambiguous || candidate.alternative === undefined) {
@@ -140,7 +142,7 @@ function CandidateRows({ candidate, onConfirm }: CandidateRowsProps) {
       <View style={[styles.row, { gap: theme.spacing.xs }]}>
         <Icon color="error" name="expired" size={16} />
         <Text color="onSurfaceVariant" style={styles.rowText} variant="bodySm">
-          {`"${candidate.source}" could be either of these. Which one is on the document?`}
+          {t('scan.ambiguousPrompt', { source: candidate.source })}
         </Text>
       </View>
       <CandidateRow candidate={candidate} date={candidate.date} onConfirm={onConfirm} />
@@ -156,6 +158,7 @@ interface CandidateRowProps {
 }
 
 function CandidateRow({ candidate, date, onConfirm }: CandidateRowProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const verified = candidate.format === 'mrz';
 
@@ -199,6 +202,7 @@ function CandidateRow({ candidate, date, onConfirm }: CandidateRowProps) {
  * single misread character makes it useless.
  */
 function MrzSummary({ result }: { result: ScanResult }) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const mrz = result.mrz;
 
@@ -228,7 +232,7 @@ function MrzSummary({ result }: { result: ScanResult }) {
   return (
     <View style={{ gap: theme.spacing.xs }} testID="scan-mrz">
       <Text color="onSurfaceVariant" variant="labelSm">
-        ALSO READ
+        {t('scan.alsoRead').toUpperCase()}
       </Text>
       {rows.map((row) => (
         <View key={row.label} style={[styles.row, { gap: theme.spacing.xs }]}>
@@ -238,7 +242,7 @@ function MrzSummary({ result }: { result: ScanResult }) {
             size={16}
           />
           <Text color="onSurfaceVariant" style={styles.rowText} variant="bodySm">
-            {`${row.label}: ${row.value}${row.verified ? '' : ' (could not be verified)'}`}
+            {row.verified ? t('scan.readRow', { label: row.label, value: row.value }) : t('scan.readRowUnverified', { label: row.label, value: row.value })}
           </Text>
         </View>
       ))}

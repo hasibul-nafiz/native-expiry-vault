@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, StatusBadge, Text, iconForCategory } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
@@ -6,6 +7,8 @@ import { documentStatus } from '@/features/expiry';
 import { minTouchTarget, useTheme } from '@/theme';
 
 import { daysLeftLabel } from '../selectors';
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
 
 /** One row in the "Vault Records" list. */
 
@@ -15,20 +18,22 @@ export interface RecordRowProps {
   onPress: (item: Item) => void;
 }
 
-const statusLabels = { safe: 'Safe', soon: 'Soon', expired: 'Expired' } as const;
+const statusKeys = { safe: 'status.safe', soon: 'status.soon', expired: 'status.expired' } as const;
 
 export function RecordRow({ item, today, onPress }: RecordRowProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const locale = useLocale();
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
-  const countdown = daysLeftLabel(item.expiryDate, today);
+  const countdown = daysLeftLabel(item.expiryDate, today, t);
 
   const subtitle = [item.country, item.issuer].filter((part) => part !== null).join(' · ');
 
   return (
     <Pressable
-      accessibilityHint="Opens the document details"
-      accessibilityLabel={`${item.title}, ${statusLabels[status]}, ${countdown}`}
+      accessibilityHint={t('dashboard.recordHint')}
+      accessibilityLabel={`${item.title}, ${t(statusKeys[status])}, ${countdown}`}
       accessibilityRole="button"
       onPress={() => {
         onPress(item);
@@ -56,7 +61,7 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
           <Text numberOfLines={1} style={styles.title} variant="labelLg">
             {item.title}
           </Text>
-          <StatusBadge label={statusLabels[status]} status={status} />
+          <StatusBadge label={t(statusKeys[status])} status={status} />
         </View>
         {subtitle === '' ? null : (
           <Text color="onSurfaceVariant" numberOfLines={1} variant="bodySm">
@@ -71,7 +76,7 @@ export function RecordRow({ item, today, onPress }: RecordRowProps) {
           style={{ color: status === 'expired' ? tone.foreground : theme.colors.onSurface }}
           variant="labelMd"
         >
-          {item.expiryDate}
+          {formatDate(item.expiryDate, locale)}
         </Text>
         <Text numberOfLines={1} style={{ color: tone.foreground }} variant="bodySm">
           {countdown}

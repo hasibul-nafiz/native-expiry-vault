@@ -20,12 +20,17 @@ import { DetailFacts } from './components/DetailFacts';
 import { RenewSheet } from './components/RenewSheet';
 import { deleteItemWithFiles } from './deleteItem';
 import { useItemDetail } from './useItemDetail';
+import { useTranslation } from 'react-i18next';
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
 
 export interface ItemDetailScreenProps {
   itemId: string;
 }
 
 export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const theme = useTheme();
   const router = useRouter();
   const databaseState = useDatabaseState();
@@ -177,13 +182,13 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
   const header = (
     <View style={[styles.header, { gap: theme.spacing.sm, paddingBottom: theme.spacing.sm }]}>
       <IconButton
-        accessibilityLabel="Back"
+        accessibilityLabel={t('itemDetail.back')}
         icon={<Icon name="chevronRight" />}
         onPress={goBack}
         testID="detail-back"
       />
       <Text numberOfLines={1} style={styles.headerTitle} variant="titleLg">
-        Details
+        {t('itemDetail.detailsTab')}
       </Text>
     </View>
   );
@@ -223,8 +228,8 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
         {header}
         <View style={[styles.missing, { gap: theme.spacing.md }]} testID="item-missing">
           <Icon color="onSurfaceVariant" name="empty" size={40} />
-          <Text variant="titleLg">This document no longer exists</Text>
-          <Button label="Back to the vault" onPress={goBack} variant="secondary" />
+          <Text variant="titleLg">{t('itemDetail.notFoundTitle')}</Text>
+          <Button label={t('itemDetail.backToVault')} onPress={goBack} variant="secondary" />
         </View>
       </Screen>
     );
@@ -254,11 +259,11 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
             testID="archived-banner"
           >
             <Text style={styles.bannerText} variant="bodyMd">
-              This document is archived and hidden from your vault.
+              {t('itemDetail.archivedBody')}
             </Text>
             <Button
               disabled={busy}
-              label="Unarchive"
+              label={t('itemDetail.unarchive')}
               onPress={() => {
                 toggleArchive(true);
               }}
@@ -281,7 +286,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
             )}
           </View>
           <IconButton
-            accessibilityLabel="Edit document"
+            accessibilityLabel={t('itemDetail.edit')}
             icon={<Icon color="onSurfaceVariant" name="document" />}
             onPress={() => {
               router.push(`/item/${itemId}/edit`);
@@ -289,7 +294,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
             testID="edit-button"
           />
           <IconButton
-            accessibilityLabel="Delete document"
+            accessibilityLabel={t('itemDetail.delete')}
             disabled={busy}
             icon={<Icon name="expired" tone={theme.colors.error} />}
             onPress={() => {
@@ -303,7 +308,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
 
         <Button
           disabled={busy}
-          label="Mark as renewed"
+          label={t('itemDetail.markRenewed')}
           onPress={() => {
             setRenewing(true);
           }}
@@ -340,11 +345,11 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
 
         <View style={{ gap: theme.spacing.sm }} testID="notes-section">
           <Text accessibilityRole="header" variant="titleLg">
-            Notes
+            {t('itemDetail.notes')}
           </Text>
           {notes.length === 0 ? (
             <Text color="onSurfaceVariant" testID="notes-empty" variant="bodySm">
-              No notes on this document.
+              {t('itemDetail.noNotes')}
             </Text>
           ) : (
             notes.map((note) => (
@@ -371,7 +376,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
         {renewals.length === 0 ? null : (
           <View style={{ gap: theme.spacing.sm }} testID="renewal-history">
             <Text accessibilityRole="header" variant="titleLg">
-              Renewal history
+              {t('itemDetail.renewalHistoryTitle')}
             </Text>
             {renewals.map((renewal) => (
               <View
@@ -388,7 +393,7 @@ export function ItemDetailScreen({ itemId }: ItemDetailScreenProps) {
               >
                 <Text variant="labelMd">{renewal.renewedOn}</Text>
                 <Text color="onSurfaceVariant" variant="bodySm">
-                  {`${renewal.previousExpiryDate} → ${renewal.newExpiryDate}`}
+                  {t('itemDetail.renewalRow', { from: formatDate(renewal.previousExpiryDate, locale), to: formatDate(renewal.newExpiryDate, locale) })}
                 </Text>
               </View>
             ))}

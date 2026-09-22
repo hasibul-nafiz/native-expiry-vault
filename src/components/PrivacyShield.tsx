@@ -7,6 +7,7 @@ import { shouldShieldContent } from '@/features/lock/autoLock';
 import { useLockState } from '@/features/lock/useLockState';
 import { screenCapturePort, type ScreenCapturePort } from '@/services/screenCapture';
 import { useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Hides the vault's contents from the app switcher.
@@ -33,6 +34,7 @@ export interface PrivacyShieldProps {
 }
 
 export function PrivacyShield({ capturePort = screenCapturePort }: PrivacyShieldProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const { enrolled } = useLockState();
   // iOS can report `null` here before the first state is determined, despite
@@ -76,7 +78,7 @@ export function PrivacyShield({ capturePort = screenCapturePort }: PrivacyShield
     >
       <Icon color="primary" name="lock" size={40} />
       <Text color="onSurfaceVariant" variant="labelLg">
-        ExpiryVault is locked
+        {t('privacyShield.locked')}
       </Text>
     </View>
   );

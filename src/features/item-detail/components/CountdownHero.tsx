@@ -3,6 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { CountdownRing, StatusBadge, Text } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
 import { daysUntilExpiry, documentStatus, lifetimeElapsed } from '@/features/expiry';
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from '@/theme';
 
 import { daysLeftLabel } from '../../dashboard/selectors';
@@ -26,10 +28,15 @@ export interface CountdownHeroProps {
   today: IsoDate;
 }
 
-const statusLabels = { safe: 'Valid', soon: 'Expiring soon', expired: 'Expired' } as const;
+const statusKeys = {
+  safe: 'status.valid',
+  soon: 'status.expiringSoon',
+  expired: 'status.expired',
+} as const;
 
 export function CountdownHero({ item, today }: CountdownHeroProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
   const remainingDays = daysUntilExpiry(item.expiryDate, today);
@@ -55,17 +62,17 @@ export function CountdownHero({ item, today }: CountdownHeroProps) {
       ]}
       testID="countdown-hero"
     >
-      <StatusBadge label={statusLabels[status]} status={status} />
+      <StatusBadge label={t(statusKeys[status])} status={status} />
 
       <CountdownRing fraction={remainingFraction} testID="countdown-ring" tone={tone.foreground}>
         <Text maxFontSizeMultiplier={1.3} testID="countdown-days" variant="displayLgMobile">
           {remainingDays < 0 ? String(Math.abs(remainingDays)) : String(remainingDays)}
         </Text>
         <Text style={{ color: tone.foreground }} variant="labelSm">
-          {remainingDays < 0 ? 'DAYS AGO' : 'DAYS LEFT'}
+          {remainingDays < 0 ? t('countdown.daysAgoLabel') : t('countdown.daysLeftLabel')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodySm">
-          {daysLeftLabel(item.expiryDate, today)}
+          {daysLeftLabel(item.expiryDate, today, t)}
         </Text>
       </CountdownRing>
 
@@ -93,10 +100,10 @@ export function CountdownHero({ item, today }: CountdownHeroProps) {
         </View>
         <View style={styles.barLabels}>
           <Text color="onSurfaceVariant" variant="bodySm">
-            Lifetime remaining
+            {t('itemDetail.lifetimeRemaining')}
           </Text>
           <Text style={{ color: tone.foreground }} testID="percent-remaining" variant="labelSm">
-            {`${percentRemaining}%`}
+            {t('itemDetail.percent', { percent: percentRemaining })}
           </Text>
         </View>
       </View>

@@ -3,9 +3,13 @@ import { StyleSheet, View } from 'react-native';
 import { Card, Icon, StatusBadge, Text, iconForCategory } from '@/components';
 import type { IsoDate, Item } from '@/db/models';
 import { documentStatus } from '@/features/expiry';
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from '@/theme';
 
 import { daysLeftLabel, elapsedFraction, elapsedLabel } from '../selectors';
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
 
 /** One card in the "Urgent Renewal" scroller. */
 
@@ -20,10 +24,12 @@ const CARD_WIDTH = 285;
 
 export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const locale = useLocale();
   const status = documentStatus(item.expiryDate, today);
   const tone = theme.status[status];
-  const countdown = daysLeftLabel(item.expiryDate, today);
-  const elapsed = elapsedLabel(item.issueDate, item.expiryDate, today);
+  const countdown = daysLeftLabel(item.expiryDate, today, t);
+  const elapsed = elapsedLabel(item.issueDate, item.expiryDate, today, t);
   const fraction = elapsedFraction(item.issueDate, item.expiryDate, today);
 
   return (
@@ -64,7 +70,7 @@ export function UrgentRenewalCard({ item, today, onPress }: UrgentRenewalCardPro
           <View style={{ gap: theme.spacing.xs }}>
             <View style={styles.header}>
               <Text color="onSurfaceVariant" variant="bodySm">
-                {item.expiryDate}
+                {formatDate(item.expiryDate, locale)}
               </Text>
               <Text variant="labelSm">{elapsed}</Text>
             </View>

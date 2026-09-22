@@ -12,6 +12,13 @@ import {
 import { useTheme } from '@/theme';
 
 import { requestReminderSync, useReminderState } from './reminderStore';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
+import type { IsoDate } from '@/db/models';
+import type { SupportedLocale } from '@/settings/preferences';
 
 /**
  * What the dashboard's bell opens.
@@ -48,6 +55,7 @@ export function RemindersSheet({
   onPermissionResolved,
   port = notificationPort,
 }: RemindersSheetProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const { outcome, syncing } = useReminderState();
   const [permission, setPermission] = useState<PermissionState | null>(null);
@@ -110,11 +118,10 @@ export function RemindersSheet({
   }, []);
 
   return (
-    <BottomSheet onClose={onClose} testID="reminders-sheet" title="Reminders" visible={visible}>
+    <BottomSheet onClose={onClose} testID="reminders-sheet" title={t('reminders.title')} visible={visible}>
       <View style={{ gap: theme.spacing.md }}>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          ExpiryVault reminds you before a document runs out. Reminders are scheduled on this device
-          and nothing is sent anywhere.
+          {t('reminders.rationale')}
         </Text>
 
         {permission === 'granted' ? (
@@ -128,7 +135,7 @@ export function RemindersSheet({
         {permission === 'undetermined' ? (
           <Button
             disabled={requesting}
-            label="Turn on reminders"
+            label={t('reminders.enable')}
             loading={requesting}
             onPress={grant}
             testID="reminders-grant"
@@ -138,11 +145,10 @@ export function RemindersSheet({
         {permission === 'denied' ? (
           <View style={{ gap: theme.spacing.sm }}>
             <Text testID="reminders-denied" variant="bodyMd">
-              Notifications are switched off for ExpiryVault, so nothing can be scheduled. Your
-              reminders are saved and will start as soon as you allow them.
+              {t('reminders.deniedBody')}
             </Text>
             <Button
-              label="Open settings"
+              label={t('common.openSettings')}
               onPress={openSettings}
               testID="reminders-settings"
               variant="secondary"
@@ -152,7 +158,7 @@ export function RemindersSheet({
 
         {permission === null ? (
           <Text color="onSurfaceVariant" testID="reminders-unknown" variant="bodySm">
-            Checking your notification settings…
+            {t('reminders.checking')}
           </Text>
         ) : null}
       </View>
@@ -168,14 +174,14 @@ interface GrantedBodyProps {
 
 function GrantedBody({ upcoming, scheduledThrough, syncing }: GrantedBodyProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const locale = useLocale();
   const today = todayLocal();
 
   if (upcoming.length === 0) {
     return (
       <Text color="onSurfaceVariant" testID="reminders-none" variant="bodyMd">
-        {syncing
-          ? 'Working out when to remind you…'
-          : 'Nothing is scheduled yet. Reminders appear here once you add a document that expires in the future.'}
+        {syncing ? t('reminders.working') : t('reminders.empty')}
       </Text>
     );
   }
@@ -187,7 +193,7 @@ function GrantedBody({ upcoming, scheduledThrough, syncing }: GrantedBodyProps) 
   return (
     <View style={{ gap: theme.spacing.sm }} testID="reminders-upcoming">
       <Text color="onSurfaceVariant" variant="labelSm">
-        NEXT REMINDERS
+        {t('reminders.nextReminders').toUpperCase()}
       </Text>
 
       {preview.map((entry) => (
@@ -214,7 +220,7 @@ function GrantedBody({ upcoming, scheduledThrough, syncing }: GrantedBodyProps) 
       ))}
 
       <Text color="onSurfaceVariant" testID="reminders-summary" variant="bodySm">
-        {summaryLine(upcoming.length, scheduledThrough, today)}
+        {summaryLine(upcoming.length, scheduledThrough, today, t, locale)}
       </Text>
     </View>
   );
@@ -229,14 +235,17 @@ export function summaryLine(
   count: number,
   scheduledThrough: string | null,
   today: string,
+  t: TFunction,
+  locale: SupportedLocale = 'en',
 ): string {
-  const scheduled = count === 1 ? '1 reminder is scheduled' : `${count} reminders are scheduled`;
-
   if (scheduledThrough === null || scheduledThrough <= today) {
-    return `${scheduled}.`;
+    return t('reminders.summary', { count });
   }
 
-  return `${scheduled}, covering everything due up to ${scheduledThrough}.`;
+  return t('reminders.summaryThrough', {
+    count,
+    date: formatDate(scheduledThrough as IsoDate, locale),
+  });
 }
 
 const styles = StyleSheet.create({

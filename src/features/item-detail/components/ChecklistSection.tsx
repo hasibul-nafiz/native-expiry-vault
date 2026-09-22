@@ -6,6 +6,7 @@ import { addDays, compareDates } from '@/features/expiry';
 import { minTouchTarget, useTheme } from '@/theme';
 
 import { checklistFor, type ChecklistStep } from '../checklistTemplates';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The renewal checklist.
@@ -37,6 +38,7 @@ export function ChecklistSection({
   tasks,
   onToggle,
 }: ChecklistSectionProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const steps = checklistFor(category);
 
@@ -47,10 +49,10 @@ export function ChecklistSection({
     <View style={{ gap: theme.spacing.sm }} testID="checklist-section">
       <View style={styles.header}>
         <Text accessibilityRole="header" variant="titleLg">
-          Renewal roadmap
+          {t('itemDetail.renewalRoadmap')}
         </Text>
         <Text color="onSurfaceVariant" testID="checklist-counter" variant="labelSm">
-          {`${doneCount} of ${steps.length} ready`}
+          {t('itemDetail.checklistReady', { done: doneCount, total: steps.length })}
         </Text>
       </View>
 

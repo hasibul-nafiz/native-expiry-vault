@@ -1,12 +1,14 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Icon, Text } from '@/components';
 import { useTheme } from '@/theme';
 
 import { Keypad } from './components/Keypad';
+import { PIN_LENGTH } from './pin';
 import { PinDots } from './components/PinDots';
-import { biometricIcon, biometricLabel, lockoutMessage, wrongPinMessage } from './labels';
+import { biometricIcon, biometricLabelKey, lockoutMessage, wrongPinMessage } from './labels';
 import { useLockScreen, type UseLockScreenOptions } from './useLockScreen';
 
 /**
@@ -29,6 +31,7 @@ export type LockScreenProps = UseLockScreenOptions;
 
 export function LockScreen(props: LockScreenProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const {
     entry,
     capability,
@@ -42,14 +45,14 @@ export function LockScreen(props: LockScreenProps) {
     promptBiometric,
   } = useLockScreen(props);
 
-  const kindLabel = biometricLabel(capability.kind);
+  const kindLabel = t(biometricLabelKey(capability.kind));
 
   const message = lockedOut
-    ? lockoutMessage(lockoutMs)
+    ? lockoutMessage(lockoutMs, t)
     : error === 'wrong-pin'
-      ? wrongPinMessage(attempts)
+      ? wrongPinMessage(attempts, t)
       : error === 'biometric-failed'
-        ? `${kindLabel} was not recognised. Enter your PIN.`
+        ? t('lock.biometricFailed', { method: kindLabel })
         : null;
 
   return (
@@ -72,14 +75,14 @@ export function LockScreen(props: LockScreenProps) {
           >
             <Icon color="onPrimaryContainer" name="lock" size={28} />
           </View>
-          <Text variant="headlineMd">Welcome back</Text>
+          <Text variant="headlineMd">{t('lock.welcome')}</Text>
           <Text color="onSurfaceVariant" style={styles.centred} variant="bodySm">
-            Your documents are encrypted on this device.
+            {t('lock.subtitle')}
           </Text>
         </View>
 
         <View style={[styles.header, { gap: theme.spacing.sm }]}>
-          <PinDots filled={entry.length} invalid={error === 'wrong-pin'} label="Master PIN" />
+          <PinDots filled={entry.length} invalid={error === 'wrong-pin'} label={t('lock.masterPin')} />
           <Text
             // Announced when it changes, so a screen reader hears the rejection
             // and the timeout rather than only seeing them.
@@ -88,15 +91,15 @@ export function LockScreen(props: LockScreenProps) {
             style={styles.centred}
             variant="labelSm"
           >
-            {message ?? 'Enter your 6-digit Master PIN'}
+            {message === null ? t('lock.enterPin', { digits: PIN_LENGTH }) : t(message)}
           </Text>
         </View>
 
         {capability.enrolled ? (
           <Button
-            accessibilityHint="Opens the system biometric prompt"
+            accessibilityHint={t('lock.biometricHint')}
             disabled={lockedOut || busy}
-            label={`Unlock with ${kindLabel}`}
+            label={t('lock.unlockWith', { method: kindLabel })}
             onPress={promptBiometric}
             size="lg"
             testID="biometric-button"
@@ -108,7 +111,7 @@ export function LockScreen(props: LockScreenProps) {
             capability.enrolled
               ? {
                   icon: biometricIcon(capability.kind),
-                  label: `Unlock with ${kindLabel}`,
+                  label: t('lock.unlockWith', { method: kindLabel }),
                   onPress: promptBiometric,
                 }
               : undefined

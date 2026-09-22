@@ -1,6 +1,7 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The tab bar, rendered natively: a real `UITabBar` on iOS and Material
@@ -19,6 +20,7 @@ import { useTheme } from '@/theme';
  * SDK 58.
  */
 export default function TabsLayout() {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
@@ -32,7 +34,7 @@ export default function TabsLayout() {
           md={{ default: 'inventory_2', selected: 'inventory_2' }}
           sf={{ default: 'shield', selected: 'shield.fill' }}
         />
-        <NativeTabs.Trigger.Label>Vault</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.vault')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="scan">
@@ -40,7 +42,7 @@ export default function TabsLayout() {
           md={{ default: 'qr_code_scanner', selected: 'qr_code_scanner' }}
           sf={{ default: 'viewfinder', selected: 'viewfinder' }}
         />
-        <NativeTabs.Trigger.Label>Scan</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.scan')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="timeline">
@@ -48,7 +50,7 @@ export default function TabsLayout() {
           md={{ default: 'event_upcoming', selected: 'event_upcoming' }}
           sf={{ default: 'calendar', selected: 'calendar' }}
         />
-        <NativeTabs.Trigger.Label>Timeline</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.timeline')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="profile">
@@ -56,7 +58,7 @@ export default function TabsLayout() {
           md={{ default: 'account_circle', selected: 'account_circle' }}
           sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }}
         />
-        <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.profile')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="settings">
@@ -64,7 +66,7 @@ export default function TabsLayout() {
           md={{ default: 'settings', selected: 'settings' }}
           sf={{ default: 'gearshape', selected: 'gearshape.fill' }}
         />
-        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.settings')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

@@ -16,6 +16,7 @@ import { addItemSchema, type AddItemFormValues } from '../add-item/schema';
 import { DashboardError, DashboardLoading } from '../dashboard/components/DashboardStates';
 import { useItemDetail } from '../item-detail/useItemDetail';
 import { requestReminderSync } from '../reminders/reminderStore';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Editing an existing document.
@@ -34,6 +35,7 @@ export interface EditItemScreenProps {
 }
 
 export function EditItemScreen({ itemId }: EditItemScreenProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
   const databaseState = useDatabaseState();
@@ -175,8 +177,8 @@ export function EditItemScreen({ itemId }: EditItemScreenProps) {
   if (item === null) {
     return (
       <Screen>
-        <Text variant="titleLg">This document no longer exists</Text>
-        <Button label="Back" onPress={close} variant="secondary" />
+        <Text variant="titleLg">{t('itemDetail.notFoundTitle')}</Text>
+        <Button label={t('common.back')} onPress={close} variant="secondary" />
       </Screen>
     );
   }
@@ -195,18 +197,18 @@ export function EditItemScreen({ itemId }: EditItemScreenProps) {
         ]}
       >
         <Button
-          label="Cancel"
+          label={t('common.cancel')}
           onPress={requestClose}
           size="sm"
           testID="edit-cancel"
           variant="ghost"
         />
         <Text numberOfLines={1} style={styles.title} variant="titleLg">
-          Edit document
+          {t('editItem.header')}
         </Text>
         <Button
           disabled={!formState.isValid || saving}
-          label="Save"
+          label={t('common.save')}
           loading={saving}
           onPress={() => {
             void onSave();

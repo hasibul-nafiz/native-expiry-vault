@@ -5,6 +5,7 @@ import type { DocumentCategory } from '@/db/models';
 import { useTheme } from '@/theme';
 
 import { categoryPresets } from '../categoryPresets';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The category grid.
@@ -20,16 +21,17 @@ export interface CategoryStepProps {
 }
 
 export function CategoryStep({ value, onSelect }: CategoryStepProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
     <View style={{ gap: theme.spacing.md }}>
       <View style={{ gap: theme.spacing.xs }}>
         <Text accessibilityRole="header" variant="titleLg">
-          Select category
+          {t('addItem.selectCategory')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          Presets calibrate smart reminders automatically.
+          {t('addItem.presetsNoteFull')}
         </Text>
       </View>
 

@@ -5,6 +5,9 @@ import { Icon, IconButton, Text } from '@/components';
 import type { IsoDate, Item, ReminderRule } from '@/db/models';
 import { compareDates, daysUntilExpiry } from '@/features/expiry';
 import { useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
 
 /**
  * The Issued / Expires / Document ID grid and the reminder strip.
@@ -27,6 +30,8 @@ function maskNumber(value: string): string {
 }
 
 export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const theme = useTheme();
   const [revealed, setRevealed] = useState(false);
   const remaining = daysUntilExpiry(item.expiryDate, today);
@@ -39,17 +44,17 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
   return (
     <View style={{ gap: theme.spacing.md }} testID="detail-facts">
       <View style={[styles.grid, { gap: theme.spacing.sm }]}>
-        <Fact label="Issued" secondary={item.country ?? undefined} value={item.issueDate ?? '—'} />
+        <Fact label={t('itemDetail.issued')} secondary={item.country ?? undefined} value={item.issueDate === null ? '—' : formatDate(item.issueDate, locale)} />
         <Fact
-          label="Expires"
+          label={t('itemDetail.expires')}
           secondary={remaining < 0 ? `${Math.abs(remaining)} days ago` : `${remaining} days left`}
           tone={theme.status[remaining < 0 ? 'expired' : 'safe'].foreground}
-          value={item.expiryDate}
+          value={formatDate(item.expiryDate, locale)}
         />
         <Fact
-          label="Renewed"
+          label={t('itemDetail.renewed')}
           secondary={item.renewedAt === null ? 'Never' : undefined}
-          value={item.renewedAt ?? '—'}
+          value={item.renewedAt === null ? '—' : formatDate(item.renewedAt, locale)}
         />
       </View>
 
@@ -68,7 +73,7 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
         >
           <View style={styles.numberText}>
             <Text color="onSurfaceVariant" variant="labelSm">
-              DOCUMENT NUMBER
+              {t('itemDetail.documentNumberLabel').toUpperCase()}
             </Text>
             <Text testID="document-number" variant="labelLg">
               {revealed ? item.documentNumber : maskNumber(item.documentNumber)}
@@ -88,7 +93,7 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
       {reminders.length === 0 ? null : (
         <View style={{ gap: theme.spacing.xs }}>
           <Text color="onSurfaceVariant" variant="labelSm">
-            REMINDER SCHEDULE
+            {t('itemDetail.reminderScheduleLabel').toUpperCase()}
           </Text>
           <View style={[styles.reminders, { gap: theme.spacing.xs }]}>
             {reminders.map((rule) => {
@@ -115,7 +120,7 @@ export function DetailFacts({ item, today, reminders }: DetailFactsProps) {
                   testID={`reminder-chip-${rule.offsetDays}`}
                 >
                   <Text style={{ color: tone }} variant="labelSm">
-                    {`${rule.offsetDays}d`}
+                    {t('itemDetail.offsetDays', { count: rule.offsetDays })}
                   </Text>
                   <Icon
                     name={sent ? 'safe' : armed ? 'alertActive' : 'soon'}

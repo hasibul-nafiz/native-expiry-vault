@@ -1,5 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button, Icon, Text } from '@/components';
 import { useTheme } from '@/theme';
 
@@ -14,6 +16,7 @@ import { useTheme } from '@/theme';
 /** Skeleton blocks laid out in roughly the shape of the loaded screen. */
 export function DashboardLoading() {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const block = (height: number, width: string | number = '100%') => (
     <View
@@ -28,7 +31,7 @@ export function DashboardLoading() {
 
   return (
     <View
-      accessibilityLabel="Loading your vault"
+      accessibilityLabel={t('dashboard.loadingAccessibility')}
       accessibilityRole="progressbar"
       style={{ gap: theme.spacing.md }}
       testID="dashboard-loading"
@@ -52,6 +55,7 @@ export interface DashboardErrorProps {
 
 export function DashboardError({ onRetry }: DashboardErrorProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -59,15 +63,15 @@ export function DashboardError({ onRetry }: DashboardErrorProps) {
       testID="dashboard-error"
     >
       <Icon color="error" name="error" size={40} />
-      <Text variant="titleLg">Could not open your vault</Text>
+      <Text variant="titleLg">{t('dashboard.errorTitle')}</Text>
       {/*
         The underlying error is deliberately not shown: a DatabaseError carries
         the failing SQL, which is not something to put in front of a user.
       */}
       <Text color="onSurfaceVariant" style={styles.centredText} variant="bodyMd">
-        Something went wrong reading your documents. Your data has not been changed.
+        {t('dashboard.errorBody')}
       </Text>
-      <Button label="Try again" onPress={onRetry} testID="dashboard-retry" />
+      <Button label={t('common.tryAgain')} onPress={onRetry} testID="dashboard-retry" />
     </View>
   );
 }
@@ -79,6 +83,7 @@ export interface DashboardEmptyProps {
 /** A genuinely empty vault, as on first launch. */
 export function DashboardEmpty({ onAdd }: DashboardEmptyProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -86,12 +91,11 @@ export function DashboardEmpty({ onAdd }: DashboardEmptyProps) {
       testID="dashboard-empty"
     >
       <Icon color="onSurfaceVariant" name="empty" size={40} />
-      <Text variant="titleLg">No documents yet</Text>
+      <Text variant="titleLg">{t('dashboard.emptyTitle')}</Text>
       <Text color="onSurfaceVariant" style={styles.centredText} variant="bodyMd">
-        Add a passport, visa, insurance policy or warranty and ExpiryVault will remind you before it
-        expires.
+        {t('dashboard.emptyBody')}
       </Text>
-      <Button label="Add document" onPress={onAdd} testID="empty-add-button" />
+      <Button label={t('dashboard.addDocument')} onPress={onAdd} testID="empty-add-button" />
     </View>
   );
 }
@@ -103,6 +107,7 @@ export interface NoMatchesProps {
 /** Documents exist, but the current filter or search matches none of them. */
 export function DashboardNoMatches({ onClear }: NoMatchesProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -110,12 +115,12 @@ export function DashboardNoMatches({ onClear }: NoMatchesProps) {
       testID="dashboard-no-matches"
     >
       <Icon color="onSurfaceVariant" name="search" size={40} />
-      <Text variant="titleLg">No matches</Text>
+      <Text variant="titleLg">{t('dashboard.noMatchesTitle')}</Text>
       <Text color="onSurfaceVariant" style={styles.centredText} variant="bodyMd">
-        No documents match the current filters.
+        {t('dashboard.noMatchesBody')}
       </Text>
       <Button
-        label="Clear filters"
+        label={t('dashboard.clearFilters')}
         onPress={onClear}
         testID="clear-filters-button"
         variant="secondary"

@@ -2,6 +2,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from '@/components';
 import type { IconName } from '@/components';
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from '@/theme';
 import type { DocumentStatus } from '@/theme';
 
@@ -9,15 +11,23 @@ import type { DocumentStatus } from '@/theme';
 
 interface Tile {
   status: DocumentStatus;
-  label: string;
-  sublabel: string;
+  labelKey: string;
+  subKey: string;
   icon: IconName;
 }
 
+/** The "< 60 days" subtitle interpolates the threshold rather than restating it. */
+const SOON_THRESHOLD_DAYS = 60;
+
 const tiles: readonly Tile[] = [
-  { status: 'safe', label: 'Valid', sublabel: 'Healthy', icon: 'safe' },
-  { status: 'soon', label: 'Review', sublabel: '< 60 days', icon: 'soon' },
-  { status: 'expired', label: 'Expired', sublabel: 'Immediate', icon: 'expired' },
+  { status: 'safe', labelKey: 'dashboard.tileValid', subKey: 'dashboard.tileValidSub', icon: 'safe' },
+  { status: 'soon', labelKey: 'dashboard.tileReview', subKey: 'dashboard.tileReviewSub', icon: 'soon' },
+  {
+    status: 'expired',
+    labelKey: 'dashboard.tileExpired',
+    subKey: 'dashboard.tileExpiredSub',
+    icon: 'expired',
+  },
 ];
 
 export interface StatusTilesProps {
@@ -28,17 +38,20 @@ export interface StatusTilesProps {
 
 export function StatusTiles({ counts, selected, onSelect }: StatusTilesProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View style={[styles.row, { gap: theme.spacing.sm }]}>
       {tiles.map((tile) => {
         const tone = theme.status[tile.status];
         const isSelected = selected === tile.status;
+        const label = t(tile.labelKey);
+        const sublabel = t(tile.subKey, { count: SOON_THRESHOLD_DAYS });
 
         return (
           <Pressable
-            accessibilityHint="Filters the list to these documents"
-            accessibilityLabel={`${tile.label}, ${counts[tile.status]} documents, ${tile.sublabel}`}
+            accessibilityHint={t('dashboard.tileHint')}
+            accessibilityLabel={`${label}, ${counts[tile.status]}, ${sublabel}`}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             key={tile.status}
@@ -66,7 +79,7 @@ export function StatusTiles({ counts, selected, onSelect }: StatusTilesProps) {
           >
             <View style={styles.header}>
               <Text color="onSurfaceVariant" numberOfLines={1} variant="labelSm">
-                {tile.label}
+                {label}
               </Text>
               <Icon name={tile.icon} size={16} tone={tone.foreground} />
             </View>
@@ -82,7 +95,7 @@ export function StatusTiles({ counts, selected, onSelect }: StatusTilesProps) {
             </Text>
 
             <Text numberOfLines={1} style={{ color: tone.foreground }} variant="labelSm">
-              {tile.sublabel}
+              {sublabel}
             </Text>
           </Pressable>
         );

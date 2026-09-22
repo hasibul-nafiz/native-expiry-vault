@@ -20,6 +20,8 @@ import type { DateCandidate } from './parseDates';
 import { ScanConfirmSheet } from './ScanConfirmSheet';
 import { publishScan } from './scanHandoff';
 import { scanImage, type ScanResult } from './scanImage';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 /**
  * The camera, the OCR pass, and the route back with a date.
@@ -62,6 +64,7 @@ export function ScannerScreen({
   pickImages = pickImagesFromLibrary,
   today,
 }: ScannerScreenProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
@@ -262,7 +265,7 @@ export function ScannerScreen({
     return (
       <Screen>
         <Text color="onSurfaceVariant" testID="scan-permission-loading" variant="bodyMd">
-          Checking camera access…
+          {t('scan.checkingCamera')}
         </Text>
       </Screen>
     );
@@ -293,9 +296,9 @@ export function ScannerScreen({
         ]}
       >
         <View style={[styles.topRow, { padding: theme.spacing.md }]}>
-          <Button label="Close" onPress={onCancel} size="sm" testID="scan-close" variant="ghost" />
+          <Button label={t('common.close')} onPress={onCancel} size="sm" testID="scan-close" variant="ghost" />
           <Button
-            label="Tips"
+            label={t('scan.tips')}
             onPress={() => {
               setTipsOpen((open) => !open);
             }}
@@ -314,7 +317,7 @@ export function ScannerScreen({
             testID="scan-frame"
           />
           <Text color="inverseOnSurface" style={styles.hint} variant="bodyMd">
-            {statusHint(mode, auto.phase, busy)}
+            {statusHint(mode, auto.phase, busy, t)}
           </Text>
         </View>
 
@@ -332,9 +335,9 @@ export function ScannerScreen({
             ]}
             testID="scan-tips-panel"
           >
-            <Text variant="labelLg">Getting a clean read</Text>
+            <Text variant="labelLg">{t('scan.tipsTitle')}</Text>
             <Text color="onSurfaceVariant" variant="bodySm">
-              Lay the document flat, fill the frame, and avoid direct glare on the page.
+              {t('scan.tipsBody')}
             </Text>
           </View>
         ) : null}
@@ -359,12 +362,12 @@ export function ScannerScreen({
 
         <View style={[styles.controls, { gap: theme.spacing.md, padding: theme.spacing.md }]}>
           <View style={[styles.modes, { gap: theme.spacing.sm }]}>
-            <ModeChip active={mode === 'manual'} label="Manual" onPress={chooseMode} value="manual" />
-            <ModeChip active={mode === 'auto'} label="Auto" onPress={chooseMode} value="auto" />
+            <ModeChip active={mode === 'manual'} label={t('scan.modeManual')} onPress={chooseMode} value="manual" />
+            <ModeChip active={mode === 'auto'} label={t('scan.modeAuto')} onPress={chooseMode} value="auto" />
           </View>
 
           <Pressable
-            accessibilityLabel="Capture the document"
+            accessibilityLabel={t('scan.title')}
             accessibilityRole="button"
             accessibilityState={{ busy, disabled: busy }}
             disabled={busy}
@@ -384,7 +387,7 @@ export function ScannerScreen({
 
           <Button
             disabled={busy}
-            label="Import from library"
+            label={t('scan.importFromLibrary')}
             onPress={() => {
               void importFromLibrary();
             }}
@@ -407,20 +410,20 @@ export function ScannerScreen({
 }
 
 /** What the frame says, so the user knows whether anything is happening. */
-export function statusHint(mode: Mode, phase: string, busy: boolean): string {
+export function statusHint(mode: Mode, phase: string, busy: boolean, t: TFunction): string {
   if (busy) {
-    return 'Reading the document…';
+    return t('scan.reading');
   }
 
   if (mode !== 'auto') {
-    return 'Align the document inside the frame, then tap the shutter.';
+    return t('scan.hint');
   }
 
   if (phase === 'exhausted') {
-    return 'Nothing readable yet. Tap the shutter to capture it yourself.';
+    return t('scan.exhausted');
   }
 
-  return 'Hold steady — looking for a date.';
+  return t('scan.searching');
 }
 
 interface ModeChipProps {
@@ -480,6 +483,7 @@ function CameraRationale({
   onImport,
   onCancel,
 }: CameraRationaleProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
@@ -487,12 +491,10 @@ function CameraRationale({
       <View style={{ gap: theme.spacing.md }}>
         <Icon color="primary" name="search" size={32} />
         <Text accessibilityRole="header" variant="headlineMd">
-          Scan a document
+          {t('scan.rationaleTitle')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          ExpiryVault uses the camera only to read dates off the document in front of it. The image
-          is processed on this device, it is never uploaded, and it is not kept unless you choose to
-          attach it.
+          {t('scan.rationaleBody')}
         </Text>
 
         {error === undefined ? null : (
@@ -504,7 +506,7 @@ function CameraRationale({
         {askable ? (
           <Button
             disabled={asking}
-            label="Allow camera access"
+            label={t('scan.allowCamera')}
             loading={asking}
             onPress={onGrant}
             testID="scan-grant"
@@ -512,11 +514,10 @@ function CameraRationale({
         ) : (
           <View style={{ gap: theme.spacing.sm }}>
             <Text testID="scan-permission-denied" variant="bodyMd">
-              Camera access is switched off for ExpiryVault. You can turn it on in Settings, or add
-              the document another way.
+              {t('scan.deniedBody')}
             </Text>
             <Button
-              label="Open settings"
+              label={t('common.openSettings')}
               onPress={() => {
                 void Linking.openSettings();
               }}
@@ -527,7 +528,7 @@ function CameraRationale({
         )}
 
         <Button
-          label="Use a photo instead"
+          label={t('scan.useAPhoto')}
           onPress={() => {
             void onImport();
           }}
@@ -535,7 +536,7 @@ function CameraRationale({
           variant="secondary"
         />
         <Button
-          label="Type the details in"
+          label={t('scan.typeTheDetailsIn')}
           onPress={onCancel}
           testID="scan-manual"
           variant="ghost"

@@ -3,6 +3,8 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTranslation } from 'react-i18next';
+
 import { Chip, Icon, IconButton, Input, Screen, Text } from '@/components';
 import { useDatabaseState } from '@/db/DatabaseProvider';
 import type { DocumentCategory, Item } from '@/db/models';
@@ -33,6 +35,7 @@ export function DashboardScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const databaseState = useDatabaseState();
 
   const [category, setCategory] = useState<DocumentCategory | null>(null);
@@ -77,13 +80,13 @@ export function DashboardScreen() {
     setSearch('');
   }, []);
 
-  const greeting = greetingFor(new Date());
+  const greeting = greetingFor(new Date(), t);
 
   const header = (
     <View style={[styles.headerRow, { paddingBottom: theme.spacing.md }]}>
       <Text variant="headlineMd">{greeting}</Text>
       <IconButton
-        accessibilityLabel="Reminders"
+        accessibilityLabel={t('dashboard.remindersButton')}
         icon={<Icon color="onSurfaceVariant" name="bell" />}
         onPress={openReminders}
         testID="notifications-button"
@@ -161,10 +164,10 @@ export function DashboardScreen() {
           ) : (
             <>
               <Input
-                accessibilityLabel="Search documents"
-                label="Search"
+                accessibilityLabel={t('dashboard.searchAccessibility')}
+                label={t('dashboard.searchLabel')}
                 onChangeText={setSearch}
-                placeholder="Search passport, visa, insurance..."
+                placeholder={t('dashboard.searchPlaceholder')}
                 returnKeyType="search"
                 testID="dashboard-search"
                 value={search}
@@ -175,7 +178,7 @@ export function DashboardScreen() {
               {data.urgent.length === 0 ? null : (
                 <View style={{ gap: theme.spacing.sm }}>
                   <Text accessibilityRole="header" variant="titleLg">
-                    Urgent renewal
+                    {t('dashboard.urgentRenewalTitle')}
                   </Text>
                   <ScrollView
                     contentContainerStyle={{ gap: theme.spacing.sm }}
@@ -217,7 +220,7 @@ export function DashboardScreen() {
 
               <View style={{ gap: theme.spacing.sm }}>
                 <Text accessibilityRole="header" color="onSurfaceVariant" variant="labelSm">
-                  VAULT RECORDS
+                  {t('dashboard.vaultRecordsTitle').toUpperCase()}
                 </Text>
 
                 {records.length === 0 ? (
@@ -247,8 +250,8 @@ export function DashboardScreen() {
       {remindersSheet}
 
       <Pressable
-        accessibilityHint="Opens the add document form"
-        accessibilityLabel="Add document"
+        accessibilityHint={t('dashboard.addDocumentHint')}
+        accessibilityLabel={t('dashboard.addDocument')}
         accessibilityRole="button"
         onPress={openAdd}
         style={({ pressed }) => [

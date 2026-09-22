@@ -8,6 +8,7 @@ import { useTheme } from '@/theme';
 import type { AddItemFormValues } from '../schema';
 
 import { DateField } from './DateField';
+import { useTranslation } from 'react-i18next';
 
 /** The detail fields. `Input` already renders `error` and `required` from F1. */
 
@@ -19,6 +20,7 @@ export interface DetailsStepProps {
 }
 
 export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   // A past expiry is valid — the vault tracks lapsed documents too — so this is
@@ -32,10 +34,10 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
     <View style={{ gap: theme.spacing.md }}>
       <View style={{ gap: theme.spacing.xs }}>
         <Text accessibilityRole="header" variant="titleLg">
-          Document details
+          {t('addItem.documentDetails')}
         </Text>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          Only the name and the expiry date are required.
+          {t('addItem.detailsNote')}
         </Text>
       </View>
 
@@ -46,10 +48,10 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
           <Input
             autoCapitalize="words"
             error={errors.title?.message}
-            label="Document name"
+            label={t('addItem.documentName')}
             onBlur={field.onBlur}
             onChangeText={field.onChange}
-            placeholder="US Passport"
+            placeholder={t('addItem.documentNamePlaceholder')}
             required
             testID="field-title"
             value={field.value ?? ''}
@@ -64,7 +66,7 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
           <DateField
             error={errors.expiryDate?.message}
             helperText={alreadyExpired ? 'This document has already expired.' : undefined}
-            label="Expiry date"
+            label={t('addItem.expiryDate')}
             onChange={field.onChange}
             required
             testID="field-expiry"
@@ -80,7 +82,7 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
           <DateField
             error={errors.issueDate?.message}
             helperText="Optional. Used to show how much of the document's life has elapsed."
-            label="Issue date"
+            label={t('addItem.issueDate')}
             onChange={field.onChange}
             testID="field-issue"
             value={field.value}
@@ -94,10 +96,10 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
         render={({ field }) => (
           <Input
             error={errors.issuer?.message}
-            label="Issuing authority"
+            label={t('addItem.issuer')}
             onBlur={field.onBlur}
             onChangeText={field.onChange}
-            placeholder="Dept of State"
+            placeholder={t('addItem.issuerPlaceholder')}
             testID="field-issuer"
             value={field.value ?? ''}
           />
@@ -112,7 +114,7 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
             autoCapitalize="characters"
             error={errors.documentNumber?.message}
             helperText="Stored encrypted. Shown masked on the document page."
-            label="Document number"
+            label={t('addItem.documentNumber')}
             onBlur={field.onBlur}
             onChangeText={field.onChange}
             testID="field-number"
@@ -128,7 +130,7 @@ export function DetailsStep({ control, errors, expiryDate, today }: DetailsStepP
           <Input
             autoCapitalize="characters"
             error={errors.country?.message}
-            label="Country code"
+            label={t('addItem.country')}
             maxLength={2}
             onBlur={field.onBlur}
             onChangeText={field.onChange}

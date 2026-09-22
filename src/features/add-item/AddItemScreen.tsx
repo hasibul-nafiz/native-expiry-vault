@@ -24,6 +24,7 @@ import { RemindersStep } from './components/RemindersStep';
 import { StepProgress } from './components/StepProgress';
 import { saveNewItem } from './saveItem';
 import { addItemSchema, stepFields, type AddItemFormValues, type StepNumber } from './schema';
+import { useTranslation } from 'react-i18next';
 
 /** The CTA label for each step, verbatim in spirit from the export. */
 const ctaLabels: Record<StepNumber, string> = {
@@ -43,6 +44,7 @@ export function AddItemScreen({
   pickImages = pickImagesFromLibrary,
   port = notificationPort,
 }: AddItemScreenProps = {}) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
   const databaseState = useDatabaseState();
@@ -284,20 +286,20 @@ export function AddItemScreen({
         ]}
       >
         <Button
-          label="Cancel"
+          label={t('common.cancel')}
           onPress={requestClose}
           size="sm"
           testID="cancel-button"
           variant="ghost"
         />
         <Text numberOfLines={1} style={styles.title} variant="titleLg">
-          New document
+          {t('addItem.newDocument')}
         </Text>
         <Button
           // The export's header Save is always enabled and bypasses the wizard;
           // here it only lights up once the whole form validates.
           disabled={!formState.isValid || saving}
-          label="Save"
+          label={t('common.save')}
           loading={saving}
           onPress={() => {
             void goNext();
@@ -372,7 +374,7 @@ export function AddItemScreen({
         ]}
       >
         {step > 1 ? (
-          <Button label="Back" onPress={goBack} testID="back-button" variant="secondary" />
+          <Button label={t('common.back')} onPress={goBack} testID="back-button" variant="secondary" />
         ) : null}
         <View style={styles.cta}>
           <Button

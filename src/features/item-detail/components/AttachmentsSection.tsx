@@ -5,6 +5,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Icon, IconButton, Text } from '@/components';
 import type { Attachment } from '@/db/models';
 import { useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Attachment thumbnails and a full-screen viewer.
@@ -33,6 +34,7 @@ export interface AttachmentsSectionProps {
 }
 
 export function AttachmentsSection({ attachments }: AttachmentsSectionProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [viewing, setViewing] = useState<Attachment | null>(null);
 
@@ -40,7 +42,7 @@ export function AttachmentsSection({ attachments }: AttachmentsSectionProps) {
     <View style={{ gap: theme.spacing.sm }} testID="attachments-section">
       <View style={styles.header}>
         <Text accessibilityRole="header" variant="titleLg">
-          Scans
+          {t('itemDetail.scans')}
         </Text>
         <Text color="onSurfaceVariant" variant="labelSm">
           {attachments.length === 0 ? '' : `${attachments.length}`}
@@ -49,13 +51,13 @@ export function AttachmentsSection({ attachments }: AttachmentsSectionProps) {
 
       {attachments.length === 0 ? (
         <Text color="onSurfaceVariant" testID="attachments-empty" variant="bodySm">
-          No scans attached to this document.
+          {t('itemDetail.noScans')}
         </Text>
       ) : (
         <View style={[styles.grid, { gap: theme.spacing.sm }]}>
           {attachments.map((attachment) => (
             <Pressable
-              accessibilityHint="Opens the scan full screen"
+              accessibilityHint={t('itemDetail.attachmentHint')}
               accessibilityLabel={`View ${attachment.fileName}`}
               accessibilityRole="button"
               key={attachment.id}
@@ -108,7 +110,7 @@ export function AttachmentsSection({ attachments }: AttachmentsSectionProps) {
         >
           <View style={[styles.viewerBar, { padding: theme.spacing.md }]}>
             <IconButton
-              accessibilityLabel="Close"
+              accessibilityLabel={t('common.close')}
               icon={<Icon name="clear" tone={theme.colors.inverseOnSurface} />}
               onPress={() => {
                 setViewing(null);

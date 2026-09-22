@@ -6,6 +6,7 @@ import { Icon, Text } from '@/components';
 import type { IsoDate } from '@/db/models';
 import { fromIsoDateLocal, toIsoDateLocal, todayLocal } from '@/features/expiry';
 import { minTouchTarget, useTheme } from '@/theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * A calendar-date field backed by the platform's own picker — a SwiftUI
@@ -40,6 +41,7 @@ export function DateField({
   required = false,
   testID,
 }: DateFieldProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const invalid = error !== undefined;
@@ -62,7 +64,7 @@ export function DateField({
       </Text>
 
       <Pressable
-        accessibilityHint="Opens the date picker"
+        accessibilityHint={t('addItem.datePickerHint')}
         accessibilityLabel={value === undefined ? `${label}, no date chosen` : `${label}, ${value}`}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
@@ -90,7 +92,7 @@ export function DateField({
           {value ?? 'Choose a date'}
         </Text>
         <Text color="primary" variant="labelMd">
-          Change
+          {t('addItem.change')}
         </Text>
       </Pressable>
 

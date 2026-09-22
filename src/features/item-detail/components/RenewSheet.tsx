@@ -6,7 +6,10 @@ import type { IsoDate } from '@/db/models';
 import { addDays, compareDates } from '@/features/expiry';
 import { useTheme } from '@/theme';
 
+import { useTranslation } from 'react-i18next';
 import { DateField } from '../../add-item/components/DateField';
+import { formatDate } from '@/i18n';
+import { useLocale } from '@/i18n/useLocale';
 
 /**
  * Asks for the new expiry date before recording a renewal.
@@ -33,7 +36,7 @@ export function suggestRenewalDate(
     Math.round(
       (new Date(`${expiryDate}T12:00:00Z`).getTime() -
         new Date(`${issueDate}T12:00:00Z`).getTime()) /
-        86_400_000,
+      86_400_000,
     ),
   );
 
@@ -59,6 +62,8 @@ export function RenewSheet({
   onConfirm,
   saving,
 }: RenewSheetProps) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const theme = useTheme();
   const [newExpiry, setNewExpiry] = useState<IsoDate>(() =>
     suggestRenewalDate(expiryDate, issueDate, today),
@@ -67,17 +72,17 @@ export function RenewSheet({
   const movesForward = compareDates(newExpiry, expiryDate) > 0;
 
   return (
-    <BottomSheet onClose={onCancel} testID="renew-sheet" title="Mark as renewed" visible={visible}>
+    <BottomSheet onClose={onCancel} testID="renew-sheet" title={t('itemDetail.markRenewed')} visible={visible}>
       <View style={{ gap: theme.spacing.md }}>
         <Text color="onSurfaceVariant" variant="bodyMd">
-          {`The current expiry is ${expiryDate}. Choose the new one — the old date is kept in this document's history.`}
+          {t('itemDetail.renewBody', { date: formatDate(expiryDate, locale) })}
         </Text>
 
         <DateField
           helperText={
             movesForward ? undefined : 'The new date is not later than the current expiry.'
           }
-          label="New expiry date"
+          label={t('itemDetail.newExpiryDate')}
           onChange={setNewExpiry}
           required
           testID="renew-date"
@@ -86,7 +91,7 @@ export function RenewSheet({
 
         <Button
           disabled={saving}
-          label="Confirm renewal"
+          label={t('itemDetail.confirmRenewal')}
           loading={saving}
           onPress={() => {
             onConfirm(newExpiry);
@@ -95,7 +100,7 @@ export function RenewSheet({
         />
         <Button
           disabled={saving}
-          label="Cancel"
+          label={t('common.cancel')}
           onPress={onCancel}
           testID="cancel-renewal"
           variant="ghost"

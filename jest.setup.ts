@@ -88,13 +88,13 @@ jest.mock('expo-camera', () => {
   const React = require('react') as typeof import('react');
 
   const CameraView = React.forwardRef((props: Record<string, unknown>, ref: unknown) => {
-      const handle = { takePictureAsync: async () => ({ uri: 'file:///captured.jpg' }) };
+    const handle = { takePictureAsync: async () => ({ uri: 'file:///captured.jpg' }) };
 
-      if (typeof ref === 'function') {
-        ref(handle);
-      } else if (ref !== null && typeof ref === 'object') {
-        (ref as { current: unknown }).current = handle;
-      }
+    if (typeof ref === 'function') {
+      ref(handle);
+    } else if (ref !== null && typeof ref === 'object') {
+      (ref as { current: unknown }).current = handle;
+    }
 
     return React.createElement('CameraView', props);
   });
@@ -136,3 +136,69 @@ jest.mock('expo-screen-capture', () => ({
   preventScreenCaptureAsync: jest.fn(async () => undefined),
   allowScreenCaptureAsync: jest.fn(async () => undefined),
 }));
+
+/**
+ * `expo-localization` reads the OS locale list through a native constant. The
+ * suite pins it to `en-US` so a developer machine set to another language does
+ * not change what the screens render.
+ */
+jest.mock('expo-localization', () => ({
+  getLocales: () => [
+    { languageTag: 'en-US', languageCode: 'en', regionCode: 'US', textDirection: 'ltr' },
+  ],
+  getCalendars: () => [],
+}));
+
+/**
+ * i18next is initialised synchronously before any test renders.
+ *
+ * In the app this happens at module scope in `app/_layout.tsx`. Without it here
+ * the first render of a screen emits raw keys and only settles once
+ * `useLocale`'s effect has run, which makes an assertion right after mount
+ * depend on effect timing rather than on the component.
+ */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+(require('@/i18n') as typeof import('@/i18n')).initialiseI18n('en');
+
+/**
+ * The preferences file is read at launch by the root layout, which several
+ * route-level tests mount. `expo-file-system`'s automock leaves `File` without
+ * a usable `exists`, so the read neither resolves nor rejects and the layout
+ * holds on its splash forever.
+ *
+ * Tests that care about the filesystem (`attachmentStorage`) mock the module
+ * themselves, which takes precedence over this.
+ */
+jest.mock('@/settings/storage', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { defaultPreferences } =
+    require('@/settings/preferences') as typeof import('@/settings/preferences');
+
+  let stored = { ...defaultPreferences };
+
+  return {
+    PREFERENCES_FILENAME: 'preferences.json',
+    preferencesStorage: {
+      read: async () => ({ ...stored }),
+      write: async (next: typeof stored) => {
+        stored = { ...next };
+      },
+    },
+  };
+});
+
+/**
+ * Preferences are loaded before any test renders.
+ *
+ * `RootLayout` holds its splash until the preferences file has been read, which
+ * is correct in the app — theme and language have to be known before the first
+ * paint. In tests that read resolves a microtask later, so a route-level
+ * assertion could race it and time out under load. Priming the store here makes
+ * the gate deterministic without changing how the app behaves.
+ */
+beforeEach(async () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const store = require('@/settings/store') as typeof import('@/settings/store');
+
+  await store.initialisePreferences();
+});

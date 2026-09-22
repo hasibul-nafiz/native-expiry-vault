@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Database } from '@/db';
 import { itemsRepository } from '@/db';
@@ -40,6 +41,7 @@ export function useDashboardData(
   filters: DashboardFilters,
 ): AsyncResult<DashboardData> {
   const { category, search } = filters;
+  const { t } = useTranslation();
 
   const load = useCallback(async (): Promise<DashboardData> => {
     if (db === null) {
@@ -68,12 +70,12 @@ export function useDashboardData(
       today,
       counts,
       total,
-      categoryFilters: buildCategoryFilters(countsByCategory, total),
+      categoryFilters: buildCategoryFilters(countsByCategory, total, t),
       nextRenewal,
       urgent: selectUrgentItems(expired, soon),
       records,
     };
-  }, [db, category, search]);
+  }, [db, category, search, t]);
 
   return useAsyncData(load);
 }

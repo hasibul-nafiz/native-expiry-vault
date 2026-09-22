@@ -4,6 +4,7 @@ import { Text } from '@/components';
 import { useTheme } from '@/theme';
 
 import { stepNames, stepNumbers, type StepNumber } from '../schema';
+import { useTranslation } from 'react-i18next';
 
 /**
  * "Step N of 4" with the cumulative bars and the jump pills.
@@ -20,18 +21,19 @@ export interface StepProgressProps {
 }
 
 export function StepProgress({ current, furthestReached, onJump }: StepProgressProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
     <View
-      accessibilityLabel={`Step ${current} of 4: ${stepNames[current]}`}
+      accessibilityLabel={t('addItem.stepProgress', { current, total: 4, name: stepNames[current] })}
       accessibilityRole="progressbar"
       accessibilityValue={{ max: 4, min: 1, now: current }}
       style={{ gap: theme.spacing.sm }}
       testID="step-progress"
     >
       <Text color="onSurfaceVariant" variant="labelSm">
-        {`Step ${current} of 4: ${stepNames[current]}`}
+        {t('addItem.stepProgress', { current, total: 4, name: stepNames[current] })}
       </Text>
 
       <View style={[styles.bars, { gap: theme.spacing.xs }]}>
