@@ -64,6 +64,8 @@ export {
 } from './models';
 
 export * as attachmentsRepository from './repositories/attachments';
+export * as backupRepository from './repositories/backup';
+export type { AllTables, ItemTagLink } from './repositories/backup';
 export * as itemNotesRepository from './repositories/itemNotes';
 export * as itemsRepository from './repositories/items';
 export * as reminderRulesRepository from './repositories/reminderRules';

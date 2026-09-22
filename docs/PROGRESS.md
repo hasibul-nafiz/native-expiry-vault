@@ -1,9 +1,9 @@
 # ExpiryVault Progress
 
 ## Current
-Feature: none started (F9 complete)
-Branch: feat/foundation (F0-F9 all landed here, not on main)
-Next: F10 Timeline + vault health screens
+Feature: none started (F12 complete)
+Branch: feat/foundation (F0-F12 all landed here, not on main)
+Next: F13 Accessibility + platform polish
 
 ## Features
 Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
@@ -18,9 +18,9 @@ Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
 - [x] F7  Reminder engine + notifications
 - [x] F8  Scan + OCR + date parser
 - [x] F9  App lock (biometric + PIN)
-- [ ] F10 Timeline + vault health screens
-- [ ] F11 Settings, i18n, 
-- [ ] F12 Backup/export/restore
+- [x] F10 Timeline + vault health screens
+- [x] F11 Settings, i18n (EN + BN)
+- [x] F12 Backup/export/restore (password-encrypted .evault, versioned, atomic)
 - [ ] F13 Accessibility + platform polish
 - [ ] F14 Store readiness (assets, 
 permissions strings, privacy policy, EAS submit)
@@ -163,6 +163,76 @@ permissions strings, privacy policy, EAS submit)
 - 2026-09-21: `dev-gallery` and `dev-seed` moved into `(app)`. Route groups carry no URL segment, so the paths are unchanged, but they are now behind the gate — this closes F3's logged "revisit at F9".
 - 2026-09-21: Settings gained one real row linking to enrolment. F9's flow is unreachable without an entry point and Settings is where it belongs; F11 restyles it with the rest of that screen.
 
+- 2026-09-22: Vault health is a deduction score, not a ratio: expired -12 (cap -48), soon -4 (cap -20), no reminder -6 (cap -24), notifications denied -15 flat, clamped to 0-100. Four expired documents is four things to do whether the vault holds five or fifty, and a ratio sends a one-document vault to 0 on a single lapse.
+- 2026-09-22: The caps exist so a long-neglected vault does not sit at 0 with no way to see progress — clearing the first few items always moves the number. `capped` is reported per deduction so the UI can say the penalty stopped growing.
+- 2026-09-22: An empty vault scores `null`, not 100. A vault with nothing in it is not healthy, and the card shows onboarding copy instead of a perfect number.
+- 2026-09-22: The score renders as a bare number, not the export's "92%". It is a points total, not a proportion of anything. The export's 92 is unreproducible from any data it shows (12 docs / 1 soon / 0 missing scores 96 here), so the weights are designed, not ported.
+- 2026-09-22: Every deduction is named, counted and priced in a breakdown card. A deduction-based formula is only worth choosing if the breakdown is shown; otherwise it is a magic number with extra steps.
+- 2026-09-22: The notification penalty is flat and only applies when at least one reminder rule exists — no rules means nothing to deliver, so a denied permission costs nothing.
+- 2026-09-22: The five timeline month bands are derived from the export's own months, not invented: it labels 42 days "Action Required" and 71 days "Upcoming Review", so the cut falls between them — exactly where `SOON_THRESHOLD_DAYS` already sits. Its ~400-day and ~4.5-year months place the other two cuts at 365 and 1095 days.
+- 2026-09-22: Only two new colour tokens were added (`review`, `secure`). The other three bands *reference* `statusLight`/`statusDark` rather than restating hexes, so a month header and a document badge describing the same urgency cannot drift. Asserted by identity, not equality, in `contrast.test.ts`.
+- 2026-09-22: `TimelineBand` lives in `src/theme/tokens/timeline.ts`, the same containment `DocumentStatus` has — the band model cannot drift from the colours that render it. The three-status model is unchanged; a band is a presentation of a whole month, never a fourth status.
+- 2026-09-22: Both new tones are contrast-tested in light and dark, and `buildBandPalette` is asserted to resolve all five bands to AA-passing pairs, so a bad value fails CI rather than shipping.
+- 2026-09-22: The timeline groups expired items into their own past month rather than an "overdue" bucket, which is what puts lapsed documents at the top of the feed where the export draws them. A month takes the tone of its most urgent item.
+- 2026-09-22: Range chips filter in JS over the already-fetched rows, not as extra queries — F4's rule, so a chip's count and the feed it filters cannot disagree across a midnight boundary. "Next 30 days" deliberately includes overdue items.
+- 2026-09-22: The export's "2026+" chip label is built from `today`, not hardcoded; it is only correct in the year it was drawn.
+- 2026-09-22: `groupByMonth` validates each expiry through `daysUntilExpiry`, so an unparseable date throws rather than forming a group nothing can render.
+- 2026-09-22: The Profile tab keeps its label (F3's five-tab set is untouched, and Android caps at five) but the screen is headed "Vault Health". There is no profile anywhere in the schema and F4 already declined to invent one.
+- 2026-09-22: "Log Out of Vault" became "Lock now", wired to F9's `lockVault()` — the only honest reading of it in an app with no account.
+- 2026-09-22: The Schengen card renders only when `travel_stays` has rows. `schengenUsage` has been tested since F2 but nothing writes stays yet, and a card permanently reading "0 of 90 days used" is worse than no card.
+- 2026-09-22: Both screens keep their header in every state (loading, error, empty), as the dashboard does, so a database that never opened does not blank the screen.
+- 2026-09-22: No migration and no new dependency in F10. Every column it reads has existed since migration 001 or 002, and `countItemsWithoutReminders` was written at F2 annotated for this screen.
+
+- 2026-09-22: Preferences live in a plain JSON file (`expo-file-system`), NOT the `settings` table F2 deferred to F11. Theme and language have to apply to the lock screen, which renders above `DatabaseProvider` — reading them from SQLCipher would paint the gate in the wrong theme and language before the vault opens. None of the five values is a secret, so no migration and no new dependency.
+- 2026-09-22: `parsePreferences` never throws and never returns a partial object; one invalid field falls back alone, so a file written by a newer version cannot reset the user's other choices.
+- 2026-09-22: A failed preferences write is swallowed. The change still applies for the session, and losing a theme preference is not worth an error dialog — nor a rejected promise inside an onPress handler.
+- 2026-09-22: Scope split as planned (F11a infra + EN, F11b BN) but both landed in one pass; the split shaped the order of work, not the branch.
+- 2026-09-22: Only EN and BN ship. Dutch was dropped at the user's request mid-plan; `supportedLocales` is the single source the missing-key test reads, so adding NL later is one array entry plus one file.
+- 2026-09-22: `i18next` + `react-i18next` + `expo-localization` added, plus `@expo-google-fonts/noto-sans-bengali` — four dependencies, each named in the plan.
+- 2026-09-22: Noto Sans Bengali is loaded at all four weights. Inter has no Bengali coverage whatsoever, so without it every Bengali string renders as tofu or falls back to an unstyled system face. `bengaliFontFamilies` is keyed by the Inter family name each typography variant already carries, so a variant needs no Bengali twin and the two cannot drift.
+- 2026-09-22: All `Intl` formatters are pinned to Latin digits with `-u-nu-latn`. Bengali's default numbering system is `beng`, so counts, scores and years would otherwise render as Bengali numerals — mixing with any raw interpolation that escaped, and making every numeric assertion locale-dependent.
+- 2026-09-22: One flat i18next namespace. The app has a few dozen screens and namespaces buy lazy-loading it cannot use — there is no network to fetch from, so every catalogue is bundled regardless.
+- 2026-09-22: `interpolation.escapeValue: false`. i18next escapes for HTML by default, which is meaningless in React Native and actively wrong: it turns an apostrophe in a document title into `&#39;`.
+- 2026-09-22: `count` is reserved by i18next for plural selection, so digit counts (PIN length) interpolate as `{{digits}}`. Using `count` there sent the lookup down a plural path with no `_one`/`_other` and rendered the raw key. Found by a test, not by inspection.
+- 2026-09-22: Label modules (`lock/labels.ts`, `timeline/labels.ts`, `vault-health/labels.ts`) kept their *rules* and take `t` as a parameter; only the copy moved to `src/i18n/locales`. Which attempt count warrants a warning, and how a duration splits into minutes and seconds, are logic worth testing independently of language.
+- 2026-09-22: Dates reach the user through `Intl` everywhere. Before F11 the dashboard, item detail, the urgent card and the renew sheet all rendered raw `YYYY-MM-DD`. The formatters are cached per locale-and-shape because they are constructed once per row.
+- 2026-09-22: `formatMonthHeading` replaces F10's hardcoded English month array on the timeline.
+- 2026-09-22: The missing-key test reads `supportedLocales` rather than a hardcoded list, and checks four things: no missing key, no extra key, no empty value, and — the two that matter — every `{{placeholder}}` preserved and both plural forms present wherever English has them. A dropped placeholder reads fine in review and renders a literal `{{count}}` at runtime.
+- 2026-09-22: `src/i18n/testing.ts` gives pure-label tests a real `t` bound to a locale rather than a stub that echoes its key. A stub would let a missing key, a broken plural or a dropped interpolation pass — exactly what these functions exist to get right.
+- 2026-09-22: `react/jsx-no-literals` plus a `no-restricted-syntax` selector over the seven user-facing props fails `npm run lint` on a bare string. A one-off sweep would only hold until F12; the rule is what keeps the guarantee. It found ~50 strings the ad-hoc scan missed.
+- 2026-09-22: The privacy policy is a bundled, translated in-app route, not a link. The app makes no network requests at all, so a policy readable only online would be the one thing in a privacy-first app that needs the internet. F14 still needs a hosted copy for the store listings; this screen is its source of truth.
+- 2026-09-22: Settings pickers are bottom sheets, not pushed routes — every list is short, and a whole route for four radio options is more navigation than the choice deserves.
+- 2026-09-22: Changing the delivery hour asks the scheduler to rebuild (`requestReminderSync`), since every pending notification is invalidated. F7 rebuilds wholesale rather than diffing, so nothing else is needed.
+- 2026-09-22: Biometric unlock is now an independent toggle, closing F9's logged gap. The row is disabled with an explanation when no hardware is enrolled.
+- 2026-09-22: Auto-lock delay and reminder hour needed no refactor: `useAutoLock` already took `graceMs` and `computeReminders` already took `options.hour`.
+- 2026-09-22: `jest.setup.ts` initialises i18next synchronously, pins `expo-localization` to `en-US`, mocks the preferences storage and primes the store. Without the last two, `RootLayout` holds its splash on an unresolved file read and route-level assertions race it under load — a flake, not a failure, which is worse.
+- 2026-09-22: The version string comes from `expo-constants` (`1.0.0`), not the export's fabricated "v2.4.0 • Build 8421". No build number is configured yet.
+
+- 2026-09-22: `.evault` is a binary framed container — magic, plaintext header, then length-prefixed AEAD frames — not a JSON envelope with base64 attachments. Bounded memory, no 33% base64 inflation, and the frame index in the associated data makes reordering or truncation an authentication failure.
+- 2026-09-22: The plaintext header carries the KDF parameters and nothing else. No counts, no dates, not even the frame count — an encrypted backup whose header advertises "47 documents, created 2026-09-22" leaks the thing it exists to protect. The frame count lives in the encrypted manifest instead.
+- 2026-09-22: Frame 0 seals a known constant and is the password check. Without it a wrong passphrase and a damaged manifest are the same event, and the app would have to guess — telling someone to check a passphrase that is already correct is a loop with no exit. It costs 32 bytes and gives an attacker no oracle they did not already have.
+- 2026-09-22: XChaCha20-Poly1305 over PBKDF2-HMAC-SHA256, via `@noble/ciphers` (one new dependency, same author and audit lineage as F9's `@noble/hashes`). ChaCha because this is JavaScript on Hermes with no AES-NI to reach, and a backup with attachments is tens of MB of symmetric work. `expo-crypto` has no symmetric cipher at all.
+- 2026-09-22: `PBKDF2_ITERATIONS = 300_000`, half OWASP's figure and deliberately so; the count is in the header, so raising it later applies to new backups without orphaning old ones. Not memory-hard, which is why the passphrase minimum is 12 characters rather than F9's six digits.
+- 2026-09-22: Argon2id was declined: a third dependency (`hash-wasm`) whose WASM path is the least proven thing on Hermes. Logged as the weakest link in the feature — a short passphrase gets less protection here than it would under Argon2.
+- 2026-09-22: `expo-document-picker` was **not** added. `expo-file-system` 57 ships `File.pickFileAsync` with the same system UI and the same "`.evault` has no registered MIME type" caveat, and was already a dependency.
+- 2026-09-22: `expo-sharing` added (the only way to attach a file to the share sheet on Android; RN's own `Share` takes `message`/`title` there). Its config plugin is **not** registered: that plugin only builds an inbound share *extension*, which this app does not have.
+- 2026-09-22: The SQLCipher key, the PIN record and every `notification_id` are excluded from the file. The first two are device-local secrets; the third is a handle into the OS scheduler of the device that wrote it, so it is exported as null and F7 rebuilds the schedule wholesale.
+- 2026-09-22: Preferences travel in the backup. Restoring onto a new phone in the device default language rather than the one the user chose is a worse failure than the small amount they reveal.
+- 2026-09-22: Restore replaces everything in one transaction; merge was declined. A merge needs a documented answer for every collision (same id different content, same document different id) that the file format cannot supply, and doubles the test surface.
+- 2026-09-22: Attachments are staged into a sibling directory and swapped in **after** the commit. A filesystem move cannot join a SQL transaction, so ordering is what makes failure survivable: up to and including the commit every failure leaves the vault untouched. The one window is a crash between commit and swap, which leaves rows pointing at files not yet in place — reported, not corrupting.
+- 2026-09-22: `src/db/repositories/backup.ts` is the only whole-table reader. Adding an `all` option to eight existing functions would make it reachable from a screen; a separate module keeps the intent explicit and the SQL in the repository layer.
+- 2026-09-22: Zod runs **after** migration, not before and after as first planned. An older payload is supposed to fail the current schema — that is what the migration is for — so validating first would reject exactly the files versioning exists to keep readable. Migrations take `Record<string, unknown>` and assume nothing instead.
+- 2026-09-22: The import schema validates referential integrity and uniqueness as well as column constraints, because foreign keys are on for the connection and SQLite would otherwise be the thing to notice — aborting a restore the user had already confirmed with a `DatabaseError` instead of a message about the file.
+- 2026-09-22: Zod 4 runs an object's refinements even when a field has already failed, so `compareDates` was being handed dates it had just rejected and threw `InvalidDateError` out of validation. Cross-field rules now stand aside when a field is already invalid. Found by a test.
+- 2026-09-22: The schema is stricter than SQLite in exactly one place: JavaScript's `trim()` treats U+00A0 as whitespace and SQLite's does not, so a title of one non-breaking space is rejected here and accepted there. Stricter is the safe direction.
+- 2026-09-22: `payloadMigrations` is empty and the runner is tested against chains the test supplies, as `migrate.test.ts` does. Version 1 is the only shape that has existed; a fabricated version 0 would prove nothing about the day a real migration is written.
+- 2026-09-22: A real v1 container is committed as bytes (`__tests__/fixtures/v1Container.ts`) and asserted to open, restore and reject a wrong password. A fixture regenerated by the current code only proves today's code agrees with itself. **Do not regenerate it** — if it stops opening, that is a breaking format change needing a version bump.
+- 2026-09-22: The export is written to the cache directory and deleted as soon as the share sheet closes, including when sharing fails. It is a complete copy of the vault protected by one passphrase; leaving it in permanent storage doubles the attack surface for the life of the install.
+- 2026-09-22: Export drops attachment rows whose file is gone and reports the count, and reports files under the attachments root that no row points at. This closes the orphan reconciliation open since F5, in both directions.
+- 2026-09-22: `count` is reserved by i18next for plural selection — again. The passphrase-length strings rendered nothing until renamed to `{{length}}`, the same trap F11 logged. The label test now asserts the placeholder is actually filled, which is what would have caught it.
+- 2026-09-22: Backup/restore is reachable only from a Settings row behind the lock gate, asserted by a navigation test: restore replaces the whole vault, so reaching it unlocked would be a way to destroy data without proving who you are.
+- 2026-09-22: This gives F9's "no PIN recovery" a real answer at last. It still cannot mean "recover my PIN"; it now means erase and restore, which is something rather than nothing.
+
 ### F1 dark-palette assumptions
 The Stitch export has no dark reference at all, so the dark palette is derived. Tier 1 is verbatim; tiers 2 and 3 are the assumptions:
 - Dark `primary`/`secondary`/`tertiary` and their containers are lifted verbatim from the `inverse-*` and `*-fixed*` tokens, which are M3's dark-side values — not invented.
@@ -237,6 +307,47 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - All F9 strings are inline English, collected in `src/features/lock/labels.ts` so F11's extraction is one file.
 - Biometrics cannot be turned off independently of the PIN. If hardware is enrolled with the OS, the prompt is offered; a separate toggle belongs with F11's settings.
 
+- F10 is not verified on a device: the feed, the rail, the five band tones and the health card have only been seen in the test renderer. Needs `npx expo run:ios` / `run:android` plus the dev-seed route to see either screen populated.
+- The health weights are a designed judgement, not a measured one. No user has ever seen the score, so whether -12 for an expired document *feels* right against -6 for a missing reminder is unvalidated. The weights are constants in one object and the stored score is derived, never persisted, so retuning them costs nothing.
+- An expired document with no reminder rule is charged under both `expired` and `missingReminders`. That is deliberate — they are two separate things to fix — but it means the two counts can exceed the vault size.
+- The score is recomputed on every focus and never stored, so there is no history and no "up from 85 last month". Adding that needs a table and a write on a schedule, which is a background task the app deliberately does not have (the limitation F7 logged).
+- `travel_stays` still has no writer. `createTravelStay` and `schengenUsage` are both tested, but until something records a trip the Schengen card can only appear via a seeded or dev database.
+- The timeline holds every active item in memory and groups in JS. Correct and fast for the tens of rows a real vault holds; a vault with thousands would want a windowed list and a grouped query, which is not worth building blind.
+- The feed is a plain mapped `View` inside a ScrollView, not a `SectionList`. Simpler and correct at this size, but it renders every card up front — revisit if the in-memory grouping above ever becomes a problem.
+- Both screens' strings are inline English, collected in `src/features/timeline/labels.ts` and `src/features/vault-health/labels.ts` so F11's extraction is two files. Month names are a hardcoded English array and need `Intl` or i18next at F11.
+- `VaultHealthScreen.test.tsx` mocks `notificationPort` through a module factory with a `mock`-prefixed variable, because the screen resolves the port through `useVaultHealth`'s default rather than taking it as a prop. Adding a test-only prop to the screen was the alternative and was not worth it.
+- The vault-health screen links to `/set-pin` and duplicates the row Settings already has. F11 owns Settings and should decide which of the two survives.
+- The export's rows for Document Categories and Expiry Alerts are not rendered — both are F11's, and a row that goes nowhere is worse than no row.
+
+- **`bn.json` is unreviewed machine-quality and must NOT ship to either store without a native-speaker pass.** Structure, plurals and interpolation are correct and tested; the wording is my own and has had no review. This is the single largest known risk in F11.
+- F11 is not verified on a device. Noto Sans Bengali rendering, the real preferences file, the Intl output on Hermes (which ships a different ICU build from Node) and the OS language picker all need `npx expo run:ios` / `run:android`. Hermes ICU is the one most likely to differ from what the suite asserts.
+- Bundle size is unmeasured. Four Noto Sans Bengali weights are a few hundred KB each and are loaded unconditionally, even for an English user. Subsetting or loading the Bengali family only when the locale is `bn` is the obvious fix and needs a real build to justify.
+- Preferences sit in an unencrypted JSON file. Theme, language, reminder hour, auto-lock delay and the biometric flag leak nothing a screenshot would not, but it is a second store outside SQLCipher and should be stated rather than implied.
+- `useLocale` calls `getLocales()` on every render. It is a synchronous read of a loaded native constant, but it is not free, and `Text` calls `useLocale` — so every text node in the tree does it. Worth measuring on a device before it becomes a habit.
+- `Text` resolves the Bengali family per render. Correct, but it means the font swap is a render-time branch rather than a theme-level one; if it shows up in a profile, move it into `buildTheme`.
+- The `settings` and `categories` tables F2 deferred to F11 were never built. Categories management is still unimplemented and the export's "Manage Categories / 6 types" row is not rendered.
+- 11 literals remain in the scan: 6 are false positives (the scanner's regex matches the TypeScript generic `Promise<…>`) and 5 are in `app/(app)/dev-seed.tsx`, which is `__DEV__`-only and removed at F14. The ESLint rule excludes the dev routes for the same reason.
+- The lint rule covers JSX children and seven props. It cannot see a string built in a variable and passed in, or a template literal assembled outside JSX — so it raises the floor, it does not prove the absence of hardcoded copy.
+- `formatDate` renders `en` as `Jan 5, 2027` (US ordering), because the catalogue key is `en` rather than `en-GB`. Fine for a worldwide audience but it is a choice, not a default.
+- Bengali plurals use CLDR `one`/`other`, the same two categories as English, so no catalogue restructuring was needed. A locale with more categories (Arabic, Russian, Polish) would need more `_` suffixes and the missing-key test would catch it.
+- The privacy policy text is prose I wrote and has had no legal review. It describes what the app actually does, but F14 should have it checked before it backs a store listing.
+- `docs/PROGRESS.md` and five other files still fail `prettier --check` from before F2; unchanged here.
+
+- **F12 is not verified on a device, and two of its unknowns are the kind that only appear there.** The PBKDF2 cost at 300,000 rounds and the ChaCha throughput per megabyte are both unmeasured on Hermes; a slow export is the most likely thing to look broken on real hardware. Needs `npx expo run:ios` / `run:android` with a vault holding real photo attachments.
+- The whole container is built in memory before it is written, and read into memory before it is opened. Frames bound the *plaintext* working set, not the file itself, so a vault with hundreds of megabytes of scans could still be a problem on a low-memory device. Streaming the file read and write is the fix and needs a real measurement to justify.
+- The share sheet, the system file picker and the directory swap are all native and have no JS representation; tests cover them through the port only.
+- ~~SQLCipher does not cover attachment files... Encryption lands at F12.~~ Partly resolved: attachments are encrypted **in the backup file**. The working copies in `<documentDirectory>/attachments/` are still plaintext on disk. Encrypting them at rest is a separate change and was not in F12's brief.
+- ~~A crash between saving the item and inserting its attachment rows can leave image files with no row pointing at them; F12's export should reconcile orphans.~~ Resolved at F12: export reports orphan files and skips rows whose file is missing; a restore replaces the directory wholesale, which clears them.
+- ~~There is no PIN recovery... Revisit at F12, when backup/restore gives it something to restore from.~~ Resolved at F12, in the only way it can be: erase and restore from a backup. There is still no way to recover a forgotten PIN itself.
+- The backup passphrase is protected by PBKDF2, which is not memory-hard. A 12-character minimum is doing the work Argon2id would otherwise do, and a determined offline attacker with a GPU gets more leverage here than they would against Argon2. Stated rather than implied.
+- JavaScript cannot guarantee the derived key or the passphrase are wiped from memory after use. Neither is logged, stored or cached, but "zeroised" would be a claim the runtime cannot back.
+- The salt and nonce in the header are unauthenticated, necessarily — they must be read before a key exists. Tampering with either makes the file fail to open, which is reported as a wrong password. That is accurate but not the true cause, and is asserted as such in a test.
+- A crash between the restore's commit and the directory swap leaves rows pointing at files that are not in place. `restoreVault` reports missing files after the swap, but nothing re-checks on the *next* launch — a startup reconciliation would close it and was not built.
+- Restore does not verify that the backup came from this app rather than a crafted file with valid structure. It cannot: there is no signing key, and adding one would mean either shipping a secret in the binary or building key management the product does not have. Validation is what stands in for it.
+- The new Bengali strings are machine-quality like the rest of `bn.json` and carry the same warning: no native-speaker review.
+- The backup screen has no progress indicator beyond a button spinner. `exportVault` and `restoreVault` both report progress per file and nothing consumes it yet — worth wiring once a device measurement shows how long a real export takes.
+- The `.evault` extension is not registered with either platform, so the picker filters on `*/*` and the OS will not offer ExpiryVault as a handler for the file. Registering a document type is a config-plugin change belonging with F14's store work.
+
 ## Design gaps
 - No Android variants or dark mode in the Stitch export
 - Design system is named "Lumina FinTech" (rename to ExpiryVault)
@@ -247,7 +358,7 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - Status colours are never declared tokens, only raw Tailwind utilities, and three of them fail WCAG AA
 - Category counts contradict across screens: add flow shows 6 presets, settings says "6 types", profile says "5 collections"
 - Three different default reminder sets appear (6mo/3mo/30d/7d in add, 6mo/30d/7d in settings, 60/30/7 in profile); F2 uses the add-flow set
-- The timeline implies a post-expiry "grace period" with its own countdown that no other screen defines
+- ~~The timeline implies a post-expiry "grace period" with its own countdown that no other screen defines~~ Resolved at F10: not ported, since nothing in the schema or any other screen backs it.
 - Two contradictory tab bars: the dashboard shows Vault/Stats/Scan/Timeline/Profile, the other three tabbed screens show Vault/Scan/Timeline/Profile/Settings, with different icons for the shared tabs
 - Settings is drawn with both a back chevron and an active Settings tab — it cannot be both a tab root and a pushed screen
 - The scanner has no tab bar but every tab bar has a Scan tab; it also shows both a back chevron and a "Cancel Scanning" close button
@@ -292,6 +403,43 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - It has no enrolment screen anywhere — choosing, confirming and removing a PIN were all designed for F9, not ported
 - It defines no wrong-PIN state, no timeout state, no error copy, no disabled state and no dark mode; every one of those was designed
 - Its only JavaScript increments a counter and swaps CSS classes: no verification, no storage, no biometric call, and the Face ID buttons simply fill all six dots
+
+- The timeline's "grace period" is not ported. Its MacBook card shows "Expired Oct 8 · Grace Period / 4 Days Left" and the banner calls it a "critical 4-day grace period", but no other screen defines the concept and the schema has no field for it. An expired document reads as expired.
+- Its "Immigration Queue Buffer — High Load Warning" meter has no data source of any kind and is not built
+- Its "Open Diagnostic Link" needs an external URL, which no column holds and which v1 could not open anyway (no network)
+- Its per-card prose ("Consulate appointment needed 30d ahead. Earliest booking slot recommended: Oct 22.") is hardcoded for one document with nothing behind it
+- Its "Auto-Renew Opt" and "Permanent Track" pills need an auto-renew flag that does not exist; "ID #DE-891" does map to `document_number`, which is masked everywhere else, so it is not surfaced here either
+- Its Calendar Sync card, "Export .ics" button and "Zero-Cloud Airgapped ICS Export" label are an export feature and belong to F12
+- Its "Dense" view-density toggle only swaps CSS classes; not built
+- Its filter chip counts do not add up (All 12, but This Year 4 + 2026+ 6 = 10) and its only JavaScript toggles `display` on hardcoded nodes
+- The vault-health export's "92%" is computed by nothing and is unreachable from its own stated figures; the formula and every band below "Good State" were designed for F10
+- Its profile card (avatar, "Isha Manzoor", email, PRO badge, "Enclave Vault Active", Edit) needs a profile that exists nowhere in the schema — the gap F4 and F9 both logged. Not ported
+- Its "Emergency Dossier Export / Generate Dossier PDF" is F12's; its only script shows a toast
+- Its "Log Out of Vault" implies an account. Rendered as "Lock now" instead
+- Its "Remind 60, 30, and 7 days prior" is a third contradictory reminder set (the add flow and settings state two others); F2's add-flow set stands
+- Its "5 collections active" contradicts the add flow's 6 presets and settings' "6 types" — the count already logged as drift
+- Its Schengen card shows "42 of 90 days used" against no recorded trips anywhere in the product
+- Neither export defines a loading, empty or error state; all of them on both screens were designed
+
+- The settings export's "AES-256" badge repeats the lock screen's false crypto claim. The vault is SQLCipher (AES-256-CBC with HMAC-SHA512); not ported, and the privacy screen states the real algorithm
+- Its "ExpiryVault v2.4.0 • Build 8421" is fabricated — the real version is 1.0.0 and no build number is configured. The row reads the version from `expo-constants` instead
+- Its search bar ("Search settings, alerts, formats...") searches a dozen static rows; not built
+- Its "Date Format / DD/MM/YYYY" picker conflicts with deriving the format from the locale, which is what `Intl` does and what a worldwide audience expects. Not ported
+- Its "Urgent Alarm Sound / Chime for final 48-hour expirations" needs a per-notification sound the app does not configure; F7 deliberately chose DEFAULT channel importance, and a chiming expiry reminder is one users switch off
+- Its "Smart Expiry Reminders" master switch would silently disable every reminder with no other indication; reminders are governed by the OS permission and per-item rules instead
+- Its "Manage Categories / 6 types / + New Category / Reorder" needs the `categories` table F2 deferred and never built. Not rendered rather than rendered dead
+- Its "Backup & Cloud-Free Export / Encrypted .evault file generation" is F12
+- Its "Theme & Appearance" subtitle reads "Lumina Light Mode", the design system's own name, which F1 already logged as needing a rename
+- Its language row shows a US flag for "English (US)". Flags are countries, not languages; the picker lists language names in their own script instead
+- It draws both a back chevron and an active Settings tab — the contradiction F3 logged; the tab root wins and no chevron is rendered
+- It defines no loading, empty or error state, and its only JavaScript toggles CSS classes
+
+- The export has no backup screen anywhere. The entire feature is one settings row reading "Backup & Cloud-Free Export / Encrypted .evault file generation", so every screen, sheet, confirmation and failure state in F12 was designed rather than recreated
+- ~~Its "Backup & Cloud-Free Export / Encrypted .evault file generation" is F12~~ Resolved at F12: the row now leads to a real screen, and the file really is an encrypted `.evault`
+- The export never says what the backup contains, how it is encrypted, or what restoring one does to the existing vault — the three things a person needs before agreeing to either direction
+- The timeline's "Export .ics" button and "Zero-Cloud Airgapped ICS Export" label were logged as F12's but are a calendar feature, not a backup one; not built, and re-filed rather than smuggled in
+- Vault health's "Emergency Dossier Export / Generate Dossier PDF" was likewise logged as F12's. It is a document-generation feature with no format, no template and no stated contents anywhere in the export; not built
+- The lock export's "Restore from airgapped seed phrase" is still not portable to anything real — a backup is protected by a passphrase the user chooses, not by a seed phrase the app generates, and nothing in the schema holds one
 
 ## Device test log
 (Feature, iOS version/device, Android version/device, result)

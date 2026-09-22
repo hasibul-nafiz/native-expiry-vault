@@ -12,7 +12,8 @@ import { initialiseLock, resetLockStore } from '@/features/lock/useLockState';
 jest.mock('@/features/lock/lockStorage', () => {
   // `jest.mock` factories are hoisted above the imports.
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const { NO_FAILURES } = require('@/features/lock/backoff') as typeof import('@/features/lock/backoff');
+  const { NO_FAILURES } =
+    require('@/features/lock/backoff') as typeof import('@/features/lock/backoff');
   const { buildPinRecord } = require('@/features/lock/pin') as typeof import('@/features/lock/pin');
   /* eslint-enable @typescript-eslint/no-require-imports */
 
@@ -80,8 +81,12 @@ describe('tab routes', () => {
     // F8 turned the Scan tab from a placeholder into a launcher for the
     // full-screen camera route, so its heading is the invitation, not the word.
     ['/scan', 'Scan a document'],
-    ['/timeline', 'Timeline'],
-    ['/profile', 'Profile'],
+    // F10 replaced both placeholders. The Timeline tab keeps its label, but the
+    // screen is headed "Expiry Timeline" as the export draws it; the Profile tab
+    // likewise keeps its label while the screen is headed for what it actually
+    // shows, there being no profile anywhere in the schema.
+    ['/timeline', 'Expiry Timeline'],
+    ['/profile', 'Vault Health'],
     ['/settings', 'Settings'],
   ])('renders %s as the %s screen', async (url, title) => {
     renderApp(url);
@@ -161,6 +166,12 @@ describe('stack routes', () => {
     // The wizard's step indicator, which is present in every one of its states.
     expect(await screen.findByTestId('step-progress')).toBeOnTheScreen();
   });
+
+  it('renders the backup route', async () => {
+    renderApp('/backup');
+
+    expect(await screen.findByTestId('backup-screen')).toBeOnTheScreen();
+  });
 });
 
 describe('unmatched routes', () => {
@@ -193,6 +204,18 @@ describe('the lock gate', () => {
 
     expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
     expect(screen.queryByText('Item detail')).not.toBeOnTheScreen();
+    expect(router.getPathname()).toBe('/lock');
+  });
+
+  /**
+   * Restore replaces the whole vault, so reaching it without unlocking would be
+   * a way to destroy someone's data without ever proving who you are.
+   */
+  it('keeps backup and restore behind the gate', async () => {
+    await enrolAndLock();
+    const router = renderApp('/backup');
+
+    expect(await screen.findByText('Welcome back')).toBeOnTheScreen();
     expect(router.getPathname()).toBe('/lock');
   });
 
