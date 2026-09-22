@@ -1,56 +1,160 @@
-# Welcome to your Expo app 👋
+# ExpiryVault
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An offline-first, privacy-first document expiry tracker for passports, visas,
+permits, insurance policies and warranties. Built with Expo and React Native
+for iOS and Android.
 
-## Get started
+Every document lives in a local, encrypted database. There is no account, no
+server, no analytics, and no network call anywhere in the app — reminders are
+scheduled by the OS, backups are files you keep yourself, and nothing about
+your documents ever leaves your device unless you explicitly export it.
 
-1. Install dependencies
+## What it does
 
-   ```bash
-   npm install
-   ```
+- **Tracks expiry dates** for any document — passport, visa, driving licence,
+  health insurance, warranty, contract, or anything else — with per-category
+  reminder defaults and a scanner that reads dates off the document itself.
+- **Reminds you before it's too late.** Reminders are scheduled locally
+  through the OS notification system, with a daily escalation as a document
+  gets close to expiring.
+- **Scans and reads documents.** The camera captures a document and on-device
+  OCR (Google ML Kit) extracts and parses the expiry date, including MRZ
+  check-digit verification for passports and IDs. Nothing is uploaded; the
+  image never leaves the device.
+- **Locks behind a PIN or biometrics.** Face ID / Touch ID / fingerprint, with
+  a PIN fallback, backoff after repeated failures, and a screen shield so the
+  app doesn't show your documents in the recent-apps switcher.
+- **Shows a timeline and a vault health score.** Upcoming expiries grouped by
+  month, and a transparent point-deduction score explaining exactly what
+  needs attention and why.
+- **Backs up and restores.** The whole vault — documents, reminders,
+  attachments — can be exported to a single password-encrypted file and
+  restored later, with no cloud involved at any point.
+- **Speaks your language.** Settings, theme, language and reminder time are
+  all real, persisted preferences. Ships in English and Bengali.
 
-2. Start the app
+## What it deliberately does not do
 
-   ```bash
-   npx expo start
-   ```
+- No account, no login, no server backend.
+- No analytics, no crash reporting, no third-party SDKs phoning home.
+- No network requests of any kind in normal use. The privacy policy is a
+  bundled, translated screen — not a link — because an app that makes no
+  network requests shouldn't need one to explain that it makes no network
+  requests.
+- No cloud backup. A backup is a file you create, keep, and restore
+  yourself.
 
-In the output, you'll find options to open the app in a
+## Tech stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Expo** (managed workflow + dev client, EAS build) targeting iOS and
+  Android
+- **React Native** with **TypeScript** in strict mode
+- **expo-router** for navigation, with typed routes and route groups
+- **expo-sqlite** with SQLCipher (`useSQLCipher: true`) for an encrypted
+  local database, keyed by a random value held in the iOS Keychain / Android
+  Keystore via `expo-secure-store`
+- **expo-local-authentication** for biometric unlock, backed by a PBKDF2
+  PIN fallback (`@noble/hashes`)
+- **expo-notifications** for local, inexact-scheduled reminders
+- **expo-camera** + **@react-native-ml-kit/text-recognition** for on-device
+  document scanning and OCR
+- **i18next** / **react-i18next** + **expo-localization** for
+  internationalisation (English, Bengali)
+- **@noble/ciphers** for the backup file's authenticated encryption
+  (XChaCha20-Poly1305)
+- **zod** for schema validation, **react-hook-form** for forms
+- **jest-expo** + **React Native Testing Library** for testing
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+No analytics, crash reporting, or other third-party SDK is included.
 
-## Get a fresh project
+## Project structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/                    Routes only (expo-router). Thin — no business logic.
+src/features/<name>/    Screens, hooks, and logic for one feature, colocated
+                         with its tests.
+src/components/         Shared UI kit (Button, Card, Input, Text, ...).
+src/db/                 SQLite schema, versioned migrations, and a
+                         repository layer — no raw SQL outside src/db.
+src/services/           Thin wrappers around native modules (notifications,
+                         OCR, biometrics, backup, screen capture) — each
+                         library has exactly one importer, so the rest of
+                         the app talks to a small typed port instead.
+src/theme/               Design tokens (colour, spacing, radius, type),
+                         light and dark, WCAG AA contrast-tested.
+src/i18n/                Locale catalogues and formatting helpers.
+docs/PROGRESS.md         Running log of what's built, decisions made, and
+                         known issues — the closest thing this repo has to
+                         a changelog.
+design/                  Reference mockups only. Never imported or shipped.
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Getting started
 
-### Other setup steps
+### Prerequisites
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- Node.js 20 or later
+- npm
+- For running on a device or simulator: Xcode (iOS) and/or Android Studio
+  (Android), set up per Expo's
+  [environment setup guide](https://docs.expo.dev/get-started/set-up-your-environment/)
 
-## Learn more
+### Install
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Run it
 
-## Join the community
+This app uses native modules (SQLCipher, biometrics, the camera, ML Kit)
+that **do not run in Expo Go**. You need a development build.
 
-Join our community of developers creating universal apps.
+```bash
+# One-time: generate the native iOS/Android projects
+npx expo prebuild
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Then, to run on a simulator/emulator or a connected device:
+npx expo run:ios
+npx expo run:android
+
+# On subsequent runs, once the native app is installed, just start the
+# JS bundler and reload the app on the device:
+npx expo start --dev-client
+```
+
+### Check your work
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint         # eslint .
+npm test             # jest
+```
+
+All three are expected to pass cleanly before anything is considered done.
+The test suite is pinned to a fixed, DST-observing timezone
+(`America/New_York`) so date and reminder logic is exercised against a real
+UTC offset rather than a CI machine's UTC default.
+
+### Building for a store
+
+Builds are configured through EAS (`eas.json`). With the
+[EAS CLI](https://docs.expo.dev/eas/) installed and logged in:
+
+```bash
+eas build --platform ios
+eas build --platform android
+```
+
+## Project status
+
+This is an active, feature-by-feature build. See
+[`docs/PROGRESS.md`](docs/PROGRESS.md) for exactly what's implemented, what
+decisions were made and why, and what's known to still need work — including
+that most native functionality has not yet been verified on a real device,
+and that the Bengali translation is machine-quality and needs a native
+speaker's review before shipping.
+
+## License
+
+See [`LICENSE`](LICENSE).
