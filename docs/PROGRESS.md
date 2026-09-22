@@ -261,9 +261,13 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - 2026-09-22: `StatusBar` follows the resolved theme instead of `style="auto"`, which followed the *system* scheme and was wrong whenever the in-app theme preference disagreed with it. `expo-system-ui` sets the window background to match, so edge-to-edge Android no longer flashes white in dark mode.
 - 2026-09-22: The vault records list became a `FlatList` with the page chrome as `ListHeaderComponent`; the bordered container is reproduced per cell, since a virtualized list has cells and no wrapper. The status filter is memoized — it re-ran over every row on every render.
 - 2026-09-22: Row components were not wrapped in `React.memo`: `reactCompiler` is enabled and already memoizes the JSX, so it would be redundant.
+- 2026-09-22: The timeline feed is a `SectionList` too. Its continuous rail was one absolutely-positioned line behind the whole feed, which a virtualized list has no wrapper to hang; each cell now paints its own segment at the same offset and the segments abut. Deferred earlier in the session as too risky, then done — the invariant turned out to be testable.
+- 2026-09-22: Every gap in the timeline feed moved from `gap` on a flex parent to padding inside the cell that owns it. Space *between* cells is space nothing paints, which is exactly where the rail would break; this is the constraint the conversion actually turns on.
+- 2026-09-22: `stickySectionHeadersEnabled={false}` on the timeline: a sticky month header floats away from the rail segment it is painted on, leaving a line running out from under the node.
+- 2026-09-22: `toSections` in `groupByMonth.ts` aliases a `MonthGroup`'s items as `data` rather than building a second structure, so the grouping rules stay in one place.
+- 2026-09-22: `timeline-feed` became `timeline-list`: the scroller is mounted in every state now (it carries the header), so "is the feed populated" is asked of the month headers instead.
 
 ## Known issues / tech debt
-- The timeline feed is still a `ScrollView` of `.map()` calls. Converting it to a `SectionList` would break the continuous rail behind the months, which is drawn as one absolutely-positioned line across the group gaps; every cell and separator would have to carry the rail instead. Deferred as a deliberate scope call — the dashboard was the unbounded list, the timeline is bounded by the same vault.
 - `tabBarHeight` (49pt / 80dp) is a documented guess, not a measurement — `expo-router/unstable-native-tabs` has no height hook. Verify on a device, and re-check after an OS or SDK upgrade.
 - The Android edge-to-edge work (window background, status-bar style, the dropped bottom inset on tab screens, `KeyboardAvoidingView` behaviour) is reasoned from the platform's behaviour, not confirmed on hardware. It is the part of F13 most likely to need a second pass.
 - The navigation-only Android navigation-bar icon contrast is untested; nothing in the app sets it, and edge-to-edge leaves it to the system theme.
@@ -468,4 +472,4 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 ## Device test log
 (Feature, iOS version/device, Android version/device, result)
 -
-- F13, not yet run on either platform. Needs, on both: VoiceOver/TalkBack sweep of every screen for label, role and focus order; the largest text size on dashboard, timeline, item detail and settings; Reduce Motion on; the keyboard on add/edit; and on Android specifically the bottom inset on all five tab screens, the FAB's clearance over the tab bar, and the navigation-bar treatment in both schemes.
+- F13, not yet run on either platform. Needs, on both: VoiceOver/TalkBack sweep of every screen for label, role and focus order; the largest text size on dashboard, timeline, item detail and settings; Reduce Motion on; the keyboard on add/edit; **the timeline rail, scrolled end to end, for any break at a month boundary or at the first and last cells**; and on Android specifically the bottom inset on all five tab screens, the FAB's clearance over the tab bar, and the navigation-bar treatment in both schemes.

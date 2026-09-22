@@ -71,3 +71,18 @@ export function groupByMonth(items: readonly Item[], today: IsoDate): MonthGroup
       };
     });
 }
+
+/**
+ * The same groups, shaped for a `SectionList`.
+ *
+ * `SectionList` insists the rows live under `data`, so the feed's sections are
+ * a `MonthGroup` with its `items` aliased rather than a second structure — the
+ * grouping rules stay in one place and the screen cannot drift from them.
+ */
+export interface MonthSection extends MonthGroup {
+  data: Item[];
+}
+
+export function toSections(groups: readonly MonthGroup[]): MonthSection[] {
+  return groups.map((group) => ({ ...group, data: group.items }));
+}

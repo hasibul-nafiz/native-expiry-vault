@@ -58,7 +58,9 @@ describe('the empty state', () => {
     wrap(<TimelineScreen />, db);
 
     expect(await screen.findByTestId('timeline-empty')).toBeTruthy();
-    expect(screen.queryByTestId('timeline-feed')).toBeNull();
+    // The list itself stays mounted in every state — it carries the header —
+    // so an empty feed is the absence of months, not of the scroller.
+    expect(screen.queryAllByTestId(/^timeline-month-/)).toHaveLength(0);
   });
 
   it('routes to the add flow', async () => {
@@ -161,7 +163,7 @@ describe('the urgent banner', () => {
 
     wrap(<TimelineScreen />, db);
 
-    await screen.findByTestId('timeline-feed');
+    await screen.findByTestId('timeline-list');
     expect(screen.queryByTestId('timeline-urgent-banner')).toBeNull();
   });
 });
@@ -214,5 +216,74 @@ describe('failure states', () => {
     wrap(<TimelineScreen />, failing);
 
     expect(await screen.findByTestId('timeline-error')).toBeTruthy();
+  });
+});
+
+/**
+ * The feed is a `SectionList`, which has cells and no wrapper to hang a single
+ * rail on. These pin the invariant that replaced it: every cell paints its own
+ * segment, which is what keeps the line unbroken.
+ */
+describe('the rail', () => {
+  it('paints a segment on every cell, headers and cards alike', async () => {
+    await seed([
+      { title: 'Passport', category: 'passport', expiryDate: '2027-03-04' },
+      { title: 'Visa', category: 'visa', expiryDate: '2027-03-28' },
+      { title: 'Warranty', category: 'warranty', expiryDate: '2027-07-01' },
+    ]);
+
+    wrap(<TimelineScreen />, db);
+
+    await screen.findByTestId('timeline-month-2027-03');
+
+    // Two month headers and three cards: a gap in this count is a gap in the line.
+    expect(screen.getAllByTestId('timeline-rail')).toHaveLength(5);
+  });
+
+  it('leaves no cell without one', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: '2027-03-04' }]);
+
+    wrap(<TimelineScreen />, db);
+
+    await screen.findByTestId('timeline-month-2027-03');
+
+    const cells =
+      screen.getAllByTestId(/^timeline-month-/).length +
+      screen.getAllByTestId(/^timeline-item-/).length;
+
+    expect(screen.getAllByTestId('timeline-rail')).toHaveLength(cells);
+  });
+
+  it('never sticks the month headers, which would detach them from the rail', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: '2027-03-04' }]);
+
+    wrap(<TimelineScreen />, db);
+    const list = await screen.findByTestId('timeline-list');
+
+    // The flag reaches the host view as the set of sticky indices; a sticky
+    // header would list its own index here.
+    expect(list.props.stickyHeaderIndices).toEqual([]);
+  });
+
+  it('virtualizes rather than mounting every card', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: '2027-03-04' }]);
+
+    wrap(<TimelineScreen />, db);
+    const list = await screen.findByTestId('timeline-list');
+
+    expect(list.props.getItem).toBeDefined();
+    expect(list.props.getItemCount).toBeDefined();
+  });
+
+  it('keeps the page chrome scrolling with the feed', async () => {
+    await seed([{ title: 'Passport', category: 'passport', expiryDate: '2027-03-04' }]);
+
+    wrap(<TimelineScreen />, db);
+
+    await screen.findByTestId('timeline-month-2027-03');
+
+    // Header content and rows share one scroller, as they did before.
+    expect(screen.getByText('Expiry Timeline')).toBeOnTheScreen();
+    expect(screen.getAllByTestId(/^timeline-item-/)).toHaveLength(1);
   });
 });

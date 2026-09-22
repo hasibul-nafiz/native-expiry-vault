@@ -1,7 +1,7 @@
 import type { Item } from '@/db/models';
 import { addDays, InvalidDateError } from '@/features/expiry';
 
-import { groupByMonth } from '../groupByMonth';
+import { groupByMonth, toSections } from '../groupByMonth';
 
 const TODAY = '2026-09-20';
 
@@ -183,5 +183,37 @@ describe('groupByMonth', () => {
     expect(() => groupByMonth([item({ expiryDate: '2026-02-30' })], TODAY)).toThrow(
       InvalidDateError,
     );
+  });
+});
+
+describe('toSections', () => {
+  it('aliases each group\'s items as SectionList data', () => {
+    const groups = groupByMonth(
+      [
+        item({ id: 'a', expiryDate: '2027-03-04' }),
+        item({ id: 'b', expiryDate: '2027-03-28' }),
+        item({ id: 'c', expiryDate: '2027-07-01' }),
+      ],
+      '2027-01-01',
+    );
+
+    const sections = toSections(groups);
+
+    expect(sections.map((section) => section.key)).toEqual(['2027-03', '2027-07']);
+    expect(sections[0].data).toBe(groups[0].items);
+    expect(sections[1].data.map((entry) => entry.id)).toEqual(['c']);
+  });
+
+  it('carries the band and the heading fields through untouched', () => {
+    const groups = groupByMonth([item({ id: 'a', expiryDate: '2027-03-04' })], '2027-01-01');
+    const [section] = toSections(groups);
+
+    expect(section.band).toBe(groups[0].band);
+    expect(section.year).toBe(2027);
+    expect(section.month).toBe(3);
+  });
+
+  it('returns nothing for no groups', () => {
+    expect(toSections([])).toEqual([]);
   });
 });
