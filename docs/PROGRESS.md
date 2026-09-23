@@ -1,9 +1,9 @@
 # ExpiryVault Progress
 
 ## Current
-Feature: none started (F13 complete)
+Feature: F14 Store readiness — docs/config pass done, artwork and account setup outstanding
 Branch: feat/foundation (F0-F13 all landed here, not on main)
-Next: F14 Store readiness (assets, permissions strings, privacy policy, EAS submit)
+Next: replace placeholder bundle id, produce real icon/splash artwork, fill store-account TODOs, then EAS build + closed testing
 
 ## Features
 Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
@@ -22,7 +22,7 @@ Status: [ ] todo, [~] in progress, [x] done (tests green, reviewed, merged)
 - [x] F11 Settings, i18n (EN + BN)
 - [x] F12 Backup/export/restore (password-encrypted .evault, versioned, atomic)
 - [x] F13 Accessibility + platform polish
-- [ ] F14 Store readiness (assets, 
+- [~] F14 Store readiness (assets, 
 permissions strings, privacy policy, EAS submit)
 
 ## Decisions
@@ -267,6 +267,12 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 - 2026-09-22: `toSections` in `groupByMonth.ts` aliases a `MonthGroup`'s items as `data` rather than building a second structure, so the grouping rules stay in one place.
 - 2026-09-22: `timeline-feed` became `timeline-list`: the scroller is mounted in every state now (it carries the header), so "is the feed populated" is asked of the month headers instead.
 
+- 2026-09-23: F14's first pass is docs and config only, at the user's explicit brief — `docs/store/` (11 files: icons/splash checklist, versioning, permissions audit, iOS usage strings, hosted privacy policy, Play Data Safety answers, Apple App Privacy answers, listing copy, screenshot checklist, EAS build/submit steps, closed testing plan) plus one `app.config.ts` line. No artwork, no dependency pruning, no dev-seed removal — each named as explicitly out of scope in `docs/store/icons-and-splash.md`'s and the plan's own scope notes.
+- 2026-09-23: `runtimeVersion: { policy: 'appVersion' }` added to `app.config.ts` — the only value EAS submit wants that wasn't already set. `ios.buildNumber`/`android.versionCode` are deliberately left unset: `eas.json`'s `appVersionSource: "remote"` + `production.autoIncrement: true` already make EAS the source of truth for both, and setting them locally would fight that counter rather than help it.
+- 2026-09-23: The hosted `docs/store/privacy-policy.md` expands the same five sections the in-app `PrivacyScreen` already renders (`privacy.*` keys in `src/i18n/locales/en.json`), rather than being drafted independently — a second, differently-worded policy is worse than no hosted copy at all. Carries the same no-legal-review caveat PROGRESS.md already logs for the in-app text.
+- 2026-09-23: Data Safety (Play) and App Privacy (Apple) answers both reduce to "no data collected" — the one fact backing every sub-answer is CLAUDE.md's "No network calls in v1", verified true in `src/` (no `fetch`/`XMLHttpRequest`/network SDK exists). Documented as a single traceable premise rather than answered category-by-category from scratch, so a future feature that *does* add network I/O has one place to know these forms need revisiting.
+- 2026-09-23: Store account fields with no source of truth in the repo (support email, support/marketing URLs, real bundle identifier, Apple Team ID, Play service-account key) are left as explicit `[TODO: ...]` placeholders across the new docs rather than invented — these are business decisions only the user can make, not something to guess for a production store listing.
+
 ## Known issues / tech debt
 - `tabBarHeight` (49pt / 80dp) is a documented guess, not a measurement — `expo-router/unstable-native-tabs` has no height hook. Verify on a device, and re-check after an OS or SDK upgrade.
 - The Android edge-to-edge work (window background, status-bar style, the dropped bottom inset on tab screens, `KeyboardAvoidingView` behaviour) is reasoned from the platform's behaviour, not confirmed on hardware. It is the part of F13 most likely to need a second pass.
@@ -473,3 +479,9 @@ The Stitch export has no dark reference at all, so the dark palette is derived. 
 (Feature, iOS version/device, Android version/device, result)
 -
 - F13, not yet run on either platform. Needs, on both: VoiceOver/TalkBack sweep of every screen for label, role and focus order; the largest text size on dashboard, timeline, item detail and settings; Reduce Motion on; the keyboard on add/edit; **the timeline rail, scrolled end to end, for any break at a month boundary or at the first and last cells**; and on Android specifically the bottom inset on all five tab screens, the FAB's clearance over the tab bar, and the navigation-bar treatment in both schemes.
+
+- F14's docs/config pass is done; the app icon, adaptive icon, and splash screen are still the Expo template artwork (`assets/expo.icon/`, `assets/images/icon.png`, `assets/images/android-icon-*.png`) — confirmed by inspecting `icon.json`, not assumed. Real branded artwork is outstanding, tracked in `docs/store/icons-and-splash.md`.
+- `ios.bundleIdentifier` / `android.package` are still the placeholder `com.expiryvault.app`, now doubly blocking: F0 logged it as needing replacement before submission, and `docs/store/build-and-submit.md`'s pre-flight checklist repeats it, since changing it after the first submission means a new listing on both stores.
+- `docs/store/permissions-audit.md` and `docs/store/ios-usage-strings.md` are both written from `app.config.ts`'s declared plugin config, not from a real `npx expo prebuild` output — the same never-verified-against-a-real-prebuild gap F7 and F9 already logged for `blockedPermissions`, now also covering the three iOS usage strings.
+- `docs/store/listing-copy.md`, `privacy-policy.md`, `data-safety-play.md`, and `app-privacy-apple.md` all carry `[TODO: ...]` placeholders for support email, support/marketing URLs, Apple Team ID, and the Play service-account key — none of these exist anywhere in the repo and are the user's to supply.
+- Play Console's closed-testing track requires 14 consecutive days with 12+ opted-in testers before Production access opens for a new developer account (`docs/store/closed-testing-plan.md`) — a timeline dependency no build or config step shortcuts; plan the release date backward from this.

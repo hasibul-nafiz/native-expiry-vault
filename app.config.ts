@@ -4,6 +4,10 @@ const config: ExpoConfig = {
   name: 'expiryvault',
   slug: 'expiryvault',
   version: '1.0.0',
+  // No OTA update channel is configured, but `eas submit` reads this to
+  // stamp build compatibility metadata; leaving it unset only matters if
+  // expo-updates is ever adopted. Tracks the human version string 1:1.
+  runtimeVersion: { policy: 'appVersion' },
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   scheme: 'expiryvault',
@@ -118,6 +122,11 @@ const config: ExpoConfig = {
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
+  },
+  extra: {
+    eas: {
+      projectId: '0427db53-e9b7-4348-8f27-28646a79da29',
+    },
   },
 };
 
