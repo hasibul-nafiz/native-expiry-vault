@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { IconButton, Screen, Text } from '@/components';
+import { Icon, IconButton, Screen, Text } from '@/components';
 import { useTheme } from '@/theme';
 
 /**
@@ -35,7 +35,7 @@ export function PrivacyScreen() {
         <View style={[{ gap: theme.spacing.sm }]}>
           <IconButton
             accessibilityLabel={t('common.back')}
-            icon="chevronRight"
+            icon={<Icon name="chevronRight" />}
             onPress={() => router.back()}
             testID="privacy-back"
           />
