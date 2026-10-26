@@ -33,18 +33,23 @@ const config: ExpoConfig = {
     blockedPermissions: [
       'android.permission.SCHEDULE_EXACT_ALARM',
       /*
-        `expo-screen-capture` declares these three for its screenshot
-        *detection* API. F9 uses none of it — only `preventScreenCaptureAsync`,
-        and the FLAG_SECURE it sets needs no permission at all.
+        `expo-screen-capture` declares these for its screenshot *detection*
+        API. F9 uses none of it — only `preventScreenCaptureAsync`, and the
+        FLAG_SECURE it sets needs no permission at all.
 
         Left in, they would advertise media-library access on the Play listing
         of an app that never reads the gallery through this module, and
         READ_MEDIA_IMAGES additionally obliges a Play Console declaration for
         something the app does not do.
+
+        DETECT_SCREEN_CAPTURE is deliberately NOT blocked: on Android 14+ the
+        module registers a screenshot callback when it loads, and without the
+        permission that call is denied and the app fails to start. It is an
+        install-time permission with no prompt, no gallery access and no Play
+        Console declaration.
       */
       'android.permission.READ_EXTERNAL_STORAGE',
       'android.permission.READ_MEDIA_IMAGES',
-      'android.permission.DETECT_SCREEN_CAPTURE',
     ],
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
